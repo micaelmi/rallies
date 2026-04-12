@@ -1,0 +1,60 @@
+services:
+  rallies-postgres-db:
+    image: postgres:16-alpine
+    container_name: rallies-postgres-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-rallies}
+    volumes:
+      - rallies_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-docker} -d ${POSTGRES_DB:-rallies}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rallies-network
+
+  rallies-backend:
+    image: node:22-alpine
+    container_name: rallies-backend
+    restart: unless-stopped
+    working_dir: /app
+    depends_on:
+      rallies-postgres-db:
+        condition: service_healthy
+    ports:
+      - "3344:3344"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      HOST: 0.0.0.0
+      PORT: 3344
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SWAGGER_BASE_URL: ${SWAGGER_BASE_URL:-http://localhost:3344}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@rallies-postgres-db:5432/${POSTGRES_DB:-rallies}
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "corepack enable &&
+      pnpm install &&
+      pnpm prisma:generate &&
+      pnpm dev"
+    networks:
+      - rallies-network
+
+volumes:
+  rallies_postgres_data:
+    driver: local
+
+networks:
+  rallies-network:
+    driver: bridge

@@ -1,0 +1,392 @@
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProfileStatus {
+  PENDING
+  ACTIVE
+}
+
+enum ClubStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ClubMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ClubMemberStatus {
+  ACTIVE
+  INVITED
+  REQUESTED
+  REMOVED
+}
+
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  ARCHIVED
+}
+
+enum MatchFormat {
+  SINGLES
+  DOUBLES
+}
+
+enum MatchStatus {
+  PENDING_CONFIRMATION
+  READY
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+}
+
+enum ParticipantType {
+  USER
+  GUEST
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum ScoreboardSessionStatus {
+  LIVE
+  PAUSED
+  FINISHED
+}
+
+enum SupportTicketType {
+  SUPPORT
+  FEEDBACK
+  SUGGESTION
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  ANSWERED
+  CLOSED
+}
+
+enum LedgerEntryType {
+  CREDIT
+  DEBIT
+}
+
+enum AnnouncementStatus {
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id                    String              @id @default(cuid()) @db.VarChar(191)
+  clerkUserId           String              @unique @db.VarChar(191)
+  email                 String              @unique @db.VarChar(320)
+  createdAt             DateTime            @default(now()) @db.Timestamp(3)
+  updatedAt             DateTime            @updatedAt @db.Timestamp(3)
+
+  profile               Profile?
+  ownedClubs            Club[]              @relation("ClubOwner")
+  clubMemberships       ClubMember[]
+  createdEvents         Event[]
+  createdAnnouncements  ClubAnnouncement[]
+  createdMatches        Match[]
+  invitedMatches        MatchInvitation[]   @relation("InvitedUser")
+  sentMatchInvitations  MatchInvitation[]   @relation("InvitedByUser")
+  scoreboardSessions    ScoreboardSession[]
+  matchParticipants     MatchParticipant[]
+  wallet                Wallet?
+  createdSupportTickets SupportTicket[]     @relation("SupportTicketCreatedBy")
+  answeredSupportTickets SupportTicket[]    @relation("SupportTicketAnsweredBy")
+}
+
+model Profile {
+  id              String        @id @default(cuid()) @db.VarChar(191)
+  userId          String        @unique @db.VarChar(191)
+  username        String        @unique @db.VarChar(30)
+  city            String?       @db.VarChar(120)
+  state           String?       @db.VarChar(120)
+  country         String        @db.VarChar(120)
+  instagramUrl    String?       @db.VarChar(2048)
+  description     String?
+  preferredLocale String        @db.VarChar(10)
+  status          ProfileStatus @default(PENDING)
+  createdAt       DateTime      @default(now()) @db.Timestamp(3)
+  updatedAt       DateTime      @updatedAt @db.Timestamp(3)
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Club {
+  id                  String              @id @default(cuid()) @db.VarChar(191)
+  name                String              @db.VarChar(120)
+  slug                String              @unique @db.VarChar(80)
+  description         String
+  logoUrl             String?             @db.VarChar(2048)
+  backgroundImageUrl  String?             @db.VarChar(2048)
+  backgroundColorHex  String?             @db.VarChar(7)
+  email               String              @db.VarChar(320)
+  phone               String?             @db.VarChar(30)
+  instagramUrl        String?             @db.VarChar(2048)
+  country             String              @db.VarChar(120)
+  state               String?             @db.VarChar(120)
+  city                String?             @db.VarChar(120)
+  address             String              @db.VarChar(255)
+  mapsUrl             String?             @db.VarChar(2048)
+  maxMembers          Int?
+  ownerId             String              @db.VarChar(191)
+  status              ClubStatus          @default(ACTIVE)
+  createdAt           DateTime            @default(now()) @db.Timestamp(3)
+  updatedAt           DateTime            @updatedAt @db.Timestamp(3)
+
+  owner               User                @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members             ClubMember[]
+  schedules           ClubSchedule[]
+  prices              ClubPrice[]
+  events              Event[]
+  announcements       ClubAnnouncement[]
+
+  @@index([ownerId])
+  @@index([city])
+}
+
+model ClubMember {
+  id        String            @id @default(cuid()) @db.VarChar(191)
+  clubId    String            @db.VarChar(191)
+  userId    String            @db.VarChar(191)
+  role      ClubMemberRole
+  status    ClubMemberStatus  @default(ACTIVE)
+  joinedAt  DateTime?         @db.Timestamp(3)
+  createdAt DateTime          @default(now()) @db.Timestamp(3)
+  updatedAt DateTime          @updatedAt @db.Timestamp(3)
+
+  club      Club              @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([clubId, userId])
+  @@index([userId])
+}
+
+model ClubSchedule {
+  id        String    @id @default(cuid()) @db.VarChar(191)
+  clubId    String    @db.VarChar(191)
+  weekday   Weekday
+  openTime  String    @db.VarChar(5)
+  closeTime String    @db.VarChar(5)
+  label     String?   @db.VarChar(120)
+  createdAt DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt DateTime  @updatedAt @db.Timestamp(3)
+
+  club      Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@index([clubId, weekday])
+}
+
+model ClubPrice {
+  id          String    @id @default(cuid()) @db.VarChar(191)
+  clubId      String    @db.VarChar(191)
+  title       String    @db.VarChar(120)
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  currency    String    @db.Char(3)
+  createdAt   DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamp(3)
+
+  club        Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@index([clubId])
+}
+
+model Event {
+  id              String      @id @default(cuid()) @db.VarChar(191)
+  clubId          String?     @db.VarChar(191)
+  title           String      @db.VarChar(160)
+  description     String
+  imageUrl        String?     @db.VarChar(2048)
+  address         String      @db.VarChar(255)
+  mapsUrl         String?     @db.VarChar(2048)
+  startAt         DateTime    @db.Timestamp(3)
+  endAt           DateTime    @db.Timestamp(3)
+  registrationUrl String?     @db.VarChar(2048)
+  createdById     String      @db.VarChar(191)
+  status          EventStatus @default(DRAFT)
+  createdAt       DateTime    @default(now()) @db.Timestamp(3)
+  updatedAt       DateTime    @updatedAt @db.Timestamp(3)
+
+  club            Club?       @relation(fields: [clubId], references: [id], onDelete: SetNull)
+  createdBy       User        @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([clubId])
+  @@index([createdById])
+  @@index([startAt])
+  @@index([status])
+}
+
+model ClubAnnouncement {
+  id          String             @id @default(cuid()) @db.VarChar(191)
+  clubId      String             @db.VarChar(191)
+  createdById String             @db.VarChar(191)
+  title       String             @db.VarChar(160)
+  content     String
+  isPinned    Boolean            @default(false)
+  status      AnnouncementStatus @default(PUBLISHED)
+  createdAt   DateTime           @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime           @updatedAt @db.Timestamp(3)
+
+  club        Club               @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  createdBy   User               @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([clubId, createdAt])
+  @@index([createdById])
+}
+
+model Match {
+  id                 String             @id @default(cuid()) @db.VarChar(191)
+  createdById        String             @db.VarChar(191)
+  format             MatchFormat
+  bestOf             Int
+  status             MatchStatus        @default(PENDING_CONFIRMATION)
+  createdAt          DateTime           @default(now()) @db.Timestamp(3)
+  updatedAt          DateTime           @updatedAt @db.Timestamp(3)
+
+  createdBy          User               @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  participants       MatchParticipant[]
+  invitations        MatchInvitation[]
+  scoreboardSession  ScoreboardSession?
+  games              Game[]
+
+  @@index([createdById])
+}
+
+model MatchParticipant {
+  id              String           @id @default(cuid()) @db.VarChar(191)
+  matchId         String           @db.VarChar(191)
+  team            Int
+  position        Int?
+  participantType ParticipantType
+  userId          String?          @db.VarChar(191)
+  displayName     String           @db.VarChar(120)
+  createdAt       DateTime         @default(now()) @db.Timestamp(3)
+
+  match           Match            @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user            User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([matchId])
+  @@index([userId])
+}
+
+model MatchInvitation {
+  id              String            @id @default(cuid()) @db.VarChar(191)
+  matchId         String            @db.VarChar(191)
+  invitedUserId   String            @db.VarChar(191)
+  invitedByUserId String            @db.VarChar(191)
+  status          InvitationStatus  @default(PENDING)
+  createdAt       DateTime          @default(now()) @db.Timestamp(3)
+  respondedAt     DateTime?         @db.Timestamp(3)
+
+  match           Match             @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  invitedUser     User              @relation("InvitedUser", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedByUser   User              @relation("InvitedByUser", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, invitedUserId])
+  @@index([invitedUserId, status])
+  @@index([invitedByUserId])
+}
+
+model ScoreboardSession {
+  id          String                   @id @default(cuid()) @db.VarChar(191)
+  matchId     String                   @unique @db.VarChar(191)
+  createdById String                   @db.VarChar(191)
+  isPublic    Boolean                  @default(false)
+  status      ScoreboardSessionStatus  @default(LIVE)
+  createdAt   DateTime                 @default(now()) @db.Timestamp(3)
+  endedAt     DateTime?                @db.Timestamp(3)
+
+  match       Match                    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  createdBy   User                     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById])
+  @@index([status])
+}
+
+model Game {
+  id          String    @id @default(cuid()) @db.VarChar(191)
+  matchId     String    @db.VarChar(191)
+  gameNumber  Int
+  team1Points Int
+  team2Points Int
+  createdAt   DateTime  @default(now()) @db.Timestamp(3)
+
+  match       Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, gameNumber])
+}
+
+model Wallet {
+  id             String        @id @default(cuid()) @db.VarChar(191)
+  userId         String        @unique @db.VarChar(191)
+  currentBalance Int           @default(0)
+  createdAt      DateTime      @default(now()) @db.Timestamp(3)
+  updatedAt      DateTime      @updatedAt @db.Timestamp(3)
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ledgerEntries  LedgerEntry[]
+}
+
+model LedgerEntry {
+  id            String           @id @default(cuid()) @db.VarChar(191)
+  walletId      String           @db.VarChar(191)
+  type          LedgerEntryType
+  amount        Int
+  referenceType String?          @db.VarChar(80)
+  referenceId   String?          @db.VarChar(191)
+  description   String?
+  createdAt     DateTime         @default(now()) @db.Timestamp(3)
+
+  wallet        Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+}
+
+model SupportTicket {
+  id           String               @id @default(cuid()) @db.VarChar(191)
+  createdById  String               @db.VarChar(191)
+  type         SupportTicketType
+  title        String               @db.VarChar(160)
+  description  String
+  status       SupportTicketStatus  @default(OPEN)
+  answer       String?
+  answeredById String?              @db.VarChar(191)
+  answeredAt   DateTime?            @db.Timestamp(3)
+  createdAt    DateTime             @default(now()) @db.Timestamp(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamp(3)
+
+  createdBy    User                 @relation("SupportTicketCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  answeredBy   User?                @relation("SupportTicketAnsweredBy", fields: [answeredById], references: [id], onDelete: SetNull)
+
+  @@index([createdById, status])
+  @@index([answeredById])
+}

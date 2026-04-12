@@ -1,0 +1,50 @@
+{
+  "name": "@rallies/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "studio": "prisma studio",
+    "database:up": "docker compose --profile dev up -d",
+    "database:stop": "docker compose --profile dev stop",
+    "database:down": "docker compose --profile dev down"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.14.12",
+    "@prisma/adapter-pg": "^7.6.0",
+    "@fastify/cors": "^11.1.0",
+    "@fastify/sensible": "^6.0.3",
+    "@fastify/swagger": "^9.5.1",
+    "@fastify/swagger-ui": "^5.2.3",
+    "@prisma/client": "^7.6.0",
+    "dotenv": "^17.2.2",
+    "fastify": "^5.6.1",
+    "fastify-plugin": "^5.1.0",
+    "fastify-raw-body": "^5.0.0",
+    "fastify-type-provider-zod": "^4.0.2",
+    "pg": "^8.16.3",
+    "pino-pretty": "^13.1.2",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/node": "^24.5.2",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "prisma": "^7.6.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
+  }
+}
