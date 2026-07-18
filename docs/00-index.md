@@ -17,3 +17,5 @@ This documentation is the source of truth for the Rallies platform.
 - 10-ai-directives.md
 - 11-data-model-v1.md
 - 12-localization-and-i18n.md
+- 13-mvp-roadmap.md
+- tasks/README.md
