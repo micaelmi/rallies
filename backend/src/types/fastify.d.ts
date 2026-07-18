@@ -10,6 +10,6 @@ declare module "fastify" {
 
   interface FastifyRequest {
     locale: SupportedLocale;
-    rawBody?: string;
+    rawBody?: string | Buffer;
   }
 }
