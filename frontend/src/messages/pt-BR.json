@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "title": "Rallies",
+    "description": "A plataforma multilíngue de tênis de mesa para jogadores, clubes, eventos e placares."
+  },
+  "nav": {
+    "home": "Início",
+    "app": "App",
+    "profiles": "Perfis",
+    "clubs": "Clubes",
+    "events": "Eventos",
+    "locale": "Idioma"
+  },
+  "landing": {
+    "eyebrow": "Tênis de mesa conectado",
+    "title": "O ponto de encontro para jogadores, clubes e histórias de partidas ao vivo.",
+    "description": "Rallies reúne descoberta, presença pública do atleta e ferramentas de dia de jogo em uma plataforma multilíngue pensada para mobile primeiro.",
+    "primaryCta": "Abrir o app",
+    "secondaryCta": "Ver eventos",
+    "highlightsTitle": "Prioridades da base",
+    "highlights": {
+      "profiles": "Perfis públicos com apresentação adaptada ao idioma",
+      "clubs": "Clubes e eventos preparados para descoberta",
+      "scoreboard": "Placar privado por padrão, com espaço para broadcast depois"
+    }
+  },
+  "appHome": {
+    "title": "Início do app",
+    "description": "Este placeholder será o ponto inicial autenticado para onboarding, conclusão de perfil e ações do usuário."
+  },
+  "placeholders": {
+    "profilesIndex": {
+      "title": "Perfis",
+      "description": "Rota placeholder para descoberta e navegação de perfis."
+    },
+    "profileMe": {
+      "title": "Meu perfil",
+      "description": "Rota placeholder para a área de perfil autenticada."
+    },
+    "profilePublic": {
+      "title": "Perfil público",
+      "description": "Rota placeholder para um perfil público de jogador."
+    },
+    "clubsIndex": {
+      "title": "Clubes",
+      "description": "Rota placeholder para descoberta de clubes."
+    },
+    "clubDetail": {
+      "title": "Página do clube",
+      "description": "Rota placeholder para a página de um clube."
+    },
+    "eventsIndex": {
+      "title": "Eventos",
+      "description": "Rota placeholder para descoberta de eventos."
+    },
+    "eventDetail": {
+      "title": "Página do evento",
+      "description": "Rota placeholder para a página de um evento."
+    }
+  },
+  "common": {
+    "comingSoon": "Rota base pronta para implementação",
+    "localeSwitch": "Trocar idioma"
+  }
+}

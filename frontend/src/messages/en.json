@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "title": "Rallies",
+    "description": "The multilingual table tennis platform for players, clubs, events and scoreboards."
+  },
+  "nav": {
+    "home": "Home",
+    "app": "App",
+    "profiles": "Profiles",
+    "clubs": "Clubs",
+    "events": "Events",
+    "locale": "Language"
+  },
+  "landing": {
+    "eyebrow": "Table tennis, connected",
+    "title": "The home court for players, clubs and live match stories.",
+    "description": "Rallies brings discovery, public player presence and match-day tooling into one multilingual platform built for mobile first.",
+    "primaryCta": "Open the app",
+    "secondaryCta": "Browse events",
+    "highlightsTitle": "Foundation priorities",
+    "highlights": {
+      "profiles": "Public profiles with locale-aware presentation",
+      "clubs": "Clubs and events built for discovery",
+      "scoreboard": "Private-first scoreboard with room for broadcast later"
+    }
+  },
+  "appHome": {
+    "title": "App home",
+    "description": "This placeholder will become the authenticated starting point for onboarding, profile completion and user actions."
+  },
+  "placeholders": {
+    "profilesIndex": {
+      "title": "Profiles",
+      "description": "Placeholder route for profile discovery and navigation."
+    },
+    "profileMe": {
+      "title": "My profile",
+      "description": "Placeholder route for the authenticated profile area."
+    },
+    "profilePublic": {
+      "title": "Public profile",
+      "description": "Placeholder route for a public player profile."
+    },
+    "clubsIndex": {
+      "title": "Clubs",
+      "description": "Placeholder route for club discovery."
+    },
+    "clubDetail": {
+      "title": "Club page",
+      "description": "Placeholder route for an individual club page."
+    },
+    "eventsIndex": {
+      "title": "Events",
+      "description": "Placeholder route for event discovery."
+    },
+    "eventDetail": {
+      "title": "Event page",
+      "description": "Placeholder route for an individual event page."
+    }
+  },
+  "common": {
+    "comingSoon": "Foundation route ready for implementation",
+    "localeSwitch": "Switch locale"
+  }
+}
