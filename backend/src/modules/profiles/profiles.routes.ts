@@ -32,6 +32,14 @@ export const registerProfilesRoutes = async (
     profilesController.updateOwnProfile
   );
 
+  app.put(
+    "/profiles/me",
+    {
+      schema: updateOwnProfileRouteSchema
+    },
+    profilesController.updateOwnProfile
+  );
+
   app.get(
     "/profiles/me",
     {

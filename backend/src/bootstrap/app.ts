@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
 import { envSchema } from "../config/env.js";
 import { registerPlugins } from "../plugins/index.js";
 import { registerRoutes } from "../plugins/routes.js";

@@ -7,6 +7,12 @@ import type {
   UpdateProfileInput
 } from "./profiles.types.js";
 
+const trimOptional = (value?: string | null): string | null | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  return value.trim();
+};
+
 export class ProfilesService {
   public constructor(private readonly profilesRepository: ProfilesRepository) {}
 
@@ -35,8 +41,9 @@ export class ProfilesService {
       });
     }
 
+    const trimmedUsername = input.username.trim();
     const existingProfile = await this.profilesRepository.findProfileByUsername(
-      input.username
+      trimmedUsername
     );
 
     if (existingProfile) {
@@ -44,13 +51,19 @@ export class ProfilesService {
         code: "PROFILE_USERNAME_ALREADY_EXISTS",
         messageKey: "errors.profiles.username_conflict",
         statusCode: 409,
-        details: { username: input.username }
+        details: { username: trimmedUsername }
       });
     }
 
     try {
       return await this.profilesRepository.createProfile(userId, {
         ...input,
+        username: trimmedUsername,
+        city: input.city ? input.city.trim() : undefined,
+        state: input.state ? input.state.trim() : undefined,
+        country: input.country.trim(),
+        instagramUrl: input.instagramUrl ? input.instagramUrl.trim() : undefined,
+        description: input.description ? input.description.trim() : undefined,
         preferredLocale: input.preferredLocale ?? fallbackLocale,
         status: ProfileStatus.ACTIVE
       });
@@ -73,19 +86,21 @@ export class ProfilesService {
       });
     }
 
+    const trimmedUsername = input.username !== undefined ? input.username.trim() : undefined;
+
     if (
-      input.username !== undefined &&
-      input.username !== currentProfile.username
+      trimmedUsername !== undefined &&
+      trimmedUsername !== currentProfile.username
     ) {
       const conflictingProfile =
-        await this.profilesRepository.findProfileByUsername(input.username);
+        await this.profilesRepository.findProfileByUsername(trimmedUsername);
 
       if (conflictingProfile && conflictingProfile.userId !== userId) {
         throw new AppError({
           code: "PROFILE_USERNAME_ALREADY_EXISTS",
           messageKey: "errors.profiles.username_conflict",
           statusCode: 409,
-          details: { username: input.username }
+          details: { username: trimmedUsername }
         });
       }
     }
@@ -93,6 +108,12 @@ export class ProfilesService {
     try {
       return await this.profilesRepository.updateProfile(userId, {
         ...input,
+        username: trimmedUsername,
+        city: trimOptional(input.city),
+        state: trimOptional(input.state),
+        country: input.country !== undefined ? input.country.trim() : undefined,
+        instagramUrl: trimOptional(input.instagramUrl),
+        description: trimOptional(input.description),
         status:
           currentProfile.status === ProfileStatus.PENDING
             ? ProfileStatus.ACTIVE

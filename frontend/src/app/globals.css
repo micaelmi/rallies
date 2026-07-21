@@ -2,69 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #f6f1e8;
-  --background-strong: #efe2cb;
-  --surface: rgba(255, 255, 255, 0.82);
-  --surface-strong: #fffaf1;
-  --foreground: #1b1611;
-  --muted: #5f5447;
-  --border: rgba(27, 22, 17, 0.12);
-  --brand: #b94f35;
-  --brand-strong: #8f341f;
-  --brand-soft: rgba(185, 79, 53, 0.12);
-  --accent: #1f6c63;
-  --shadow: 0 18px 40px rgba(48, 31, 14, 0.08);
-  --radius: 24px;
+@layer base {
+  :root,
+  .dark {
+    /* Dark mode default per docs/14-design-patterns.md */
+    --background: 240 10% 3.9%;          /* #09090b - Darkest background */
+    --foreground: 0 0% 98%;              /* #fafafa - Clean high-contrast white */
+
+    --card: 240 10% 6%;                  /* #121215 - Surface (cards, panels, dialogs) */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 10%;              /* #1e1e24 - Elevated Surface (dropdowns, menus) */
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 217.2 91.2% 59.8%;        /* #3b82f6 - Medium blue for primary actions & active states */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 3.7% 15.9%;         /* #27272a - Dark neutral surface */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;             /* #27272a */
+    --muted-foreground: 240 5% 64.9%;    /* #a1a1aa - Subdued supporting text */
+
+    --accent: 240 3.7% 15.9%;            /* #27272a - Hover / subtle interactive surfaces */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;        /* #ef4444 - Red for errors and destructive actions */
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 142.1 70.6% 45.3%;        /* #10b981 - Green for success states */
+    --success-foreground: 0 0% 98%;
+
+    --warning: 38 92% 50%;               /* #f59e0b - Amber for warnings */
+    --warning-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;            /* #27272a - Subtle border */
+    --input: 240 3.7% 15.9%;             /* #27272a - Form input borders */
+    --ring: 217.2 91.2% 59.8%;           /* #3b82f6 - Blue focus ring */
+
+    /* Base radius: 8px (buttons 8px, cards 12px, dialogs 16px) */
+    --radius: 0.5rem;                    /* 8px */
+
+    /* Legacy compatibility tokens mapped to new design system */
+    --surface: 240 10% 6%;
+    --surface-strong: 240 10% 10%;
+    --brand: 217.2 91.2% 59.8%;
+    --brand-strong: 217.2 91.2% 50%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 0 0% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 217.2 91.2% 59.8%;
+  }
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground min-h-screen antialiased;
+    margin: 0;
+    font-family: var(--font-geist-sans), "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Typography Hierarchy per docs/14-design-patterns.md */
+  h1 {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight text-foreground;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight text-foreground;
+  }
+
+  h3 {
+    @apply text-lg sm:text-xl font-semibold tracking-tight text-foreground;
+  }
 }
 
-html {
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.75), transparent 38%),
-    linear-gradient(180deg, #fbf7f0 0%, #f6f1e8 48%, #efe4d4 100%);
-  color: var(--foreground);
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  color: var(--foreground);
-  font-family: "Aptos", "Segoe UI Variable", "Trebuchet MS", sans-serif;
-  text-rendering: optimizeLegibility;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-::selection {
-  background: rgba(185, 79, 53, 0.24);
-}
-
+/* Page shell container */
 .page-shell {
   min-height: 100vh;
-}
-
-.page-shell::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.52), transparent 22%),
-    radial-gradient(circle at 85% 20%, rgba(31, 108, 99, 0.1), transparent 24%),
-    radial-gradient(circle at 80% 85%, rgba(185, 79, 53, 0.09), transparent 18%);
+  background-color: hsl(var(--background));
 }

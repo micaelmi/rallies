@@ -58,6 +58,87 @@
       "description": "Placeholder route for an individual event page."
     }
   },
+  "profiles": {
+    "setup": {
+      "eyebrow": "Player Onboarding",
+      "title": "Complete your player card",
+      "description": "Set up your public Rallies presence so players and clubs can discover and connect with you across the table tennis ecosystem.",
+      "step1": "Player Handle",
+      "step2": "Sport Identity",
+      "step3": "Home Court Location",
+      "usernameLabel": "Username / Player Handle",
+      "usernamePlaceholder": "e.g. hugo_calderano",
+      "usernameHint": "Your unique public link: rallies.app/profiles/your_handle",
+      "usernameChecking": "Checking availability...",
+      "usernameAvailable": "Handle is available!",
+      "usernameTaken": "This handle is already taken. Try another.",
+      "usernameInvalid": "Use 3 to 30 characters (letters, numbers, underscores only).",
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "e.g. Hugo Calderano",
+      "gripStyleLabel": "Table Tennis Grip Style",
+      "gripStylePlaceholder": "Select your primary grip",
+      "gripStyles": {
+        "shakehand": "🏓 Shakehand",
+        "penhold_traditional": "🏓 Traditional Penhold",
+        "penhold_modern": "🏓 Modern Penhold (RPB)"
+      },
+      "dominantHandLabel": "Dominant Hand",
+      "dominantHands": {
+        "right": "Right-handed",
+        "left": "Left-handed",
+        "ambidextrous": "Ambidextrous"
+      },
+      "ratingLabel": "Estimated Rating / Skill Level",
+      "ratings": {
+        "beginner": "Beginner (< 1000)",
+        "intermediate": "Intermediate (1000 - 1500)",
+        "advanced": "Advanced (1500 - 2000)",
+        "pro": "Elite / Pro (2000+)"
+      },
+      "bioLabel": "Player Bio & Story",
+      "bioPlaceholder": "Tell the community about your playstyle, gear setup, or favorite clubs...",
+      "instagramLabel": "Instagram URL (Optional)",
+      "instagramPlaceholder": "https://instagram.com/yourhandle",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select your country",
+      "stateLabel": "State / Province / Region (Optional)",
+      "statePlaceholder": "e.g. California or São Paulo",
+      "cityLabel": "City (Optional)",
+      "cityPlaceholder": "e.g. San Jose or Rio de Janeiro",
+      "back": "Back",
+      "next": "Next step",
+      "submit": "Publish Player Card",
+      "submitting": "Publishing profile...",
+      "successTitle": "Welcome to the court!",
+      "successDescription": "Your public profile is now live and ready for match play.",
+      "viewProfile": "View My Profile",
+      "previewHeading": "Live Card Preview",
+      "badgeGrip": "Grip",
+      "badgeHand": "Hand",
+      "badgeRating": "Level",
+      "errorConflict": "That username is already taken. Please choose another handle.",
+      "errorGeneric": "Something went wrong creating your profile. Please try again."
+    },
+    "public": {
+      "memberSince": "Member since",
+      "active": "Active Player",
+      "bio": "Player Bio",
+      "location": "Home Court Location",
+      "instagram": "Instagram",
+      "matchHistoryTab": "Match History",
+      "clubsTab": "Clubs & Teams",
+      "eventsTab": "Tournaments",
+      "noBio": "No bio provided yet.",
+      "noMatches": "No public matches recorded yet.",
+      "noClubs": "Not currently affiliated with a public club.",
+      "noEvents": "No upcoming public events.",
+      "shareProfile": "Share Profile",
+      "editProfile": "Edit Profile",
+      "notFoundTitle": "Player Not Found",
+      "notFoundDescription": "We couldn't find a public player card with this handle. The player may have set their profile to private or changed their username.",
+      "backToDirectory": "Back to Profiles"
+    }
+  },
   "common": {
     "comingSoon": "Foundation route ready for implementation",
     "localeSwitch": "Switch locale"

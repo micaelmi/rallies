@@ -58,6 +58,87 @@
       "description": "Rota placeholder para a página de um evento."
     }
   },
+  "profiles": {
+    "setup": {
+      "eyebrow": "Onboarding de Jogador",
+      "title": "Complete seu cartão de atleta",
+      "description": "Configure sua presença pública no Rallies para que jogadores e clubes possam descobrir e se conectar com você nas mesas.",
+      "step1": "Handle do Jogador",
+      "step2": "Identidade Esportiva",
+      "step3": "Localização Principal",
+      "usernameLabel": "Nome de Usuário / Handle",
+      "usernamePlaceholder": "ex. hugo_calderano",
+      "usernameHint": "Seu link público exclusivo: rallies.app/profiles/seu_handle",
+      "usernameChecking": "Verificando disponibilidade...",
+      "usernameAvailable": "Handle disponível!",
+      "usernameTaken": "Este handle já está em uso. Tente outro.",
+      "usernameInvalid": "Use de 3 a 30 caracteres (apenas letras, números e underlines).",
+      "displayNameLabel": "Nome de Exibição",
+      "displayNamePlaceholder": "ex. Hugo Calderano",
+      "gripStyleLabel": "Estilo de Empunhadura",
+      "gripStylePlaceholder": "Selecione sua empunhadura principal",
+      "gripStyles": {
+        "shakehand": "🏓 Clássica (Shakehand)",
+        "penhold_traditional": "🏓 Caneta Tradicional (Japonesa)",
+        "penhold_modern": "🏓 Classineta"
+      },
+      "dominantHandLabel": "Mão Dominante",
+      "dominantHands": {
+        "right": "Destro",
+        "left": "Canhoto",
+        "ambidextrous": "Ambidestro"
+      },
+      "ratingLabel": "Nível / Rating Estimado",
+      "ratings": {
+        "beginner": "Iniciante (< 1000)",
+        "intermediate": "Intermediário (1000 - 1500)",
+        "advanced": "Avançado (1500 - 2000)",
+        "pro": "Elite / Pro (2000+)"
+      },
+      "bioLabel": "Biografia & Estilo de Jogo",
+      "bioPlaceholder": "Conte à comunidade sobre seu estilo de jogo, raquete, borrachas ou clubes preferidos...",
+      "instagramLabel": "URL do Instagram (Opcional)",
+      "instagramPlaceholder": "https://instagram.com/seuhandle",
+      "countryLabel": "País",
+      "countryPlaceholder": "Selecione seu país",
+      "stateLabel": "Estado / Província / Região (Opcional)",
+      "statePlaceholder": "ex. São Paulo ou Rio de Janeiro",
+      "cityLabel": "Cidade (Opcional)",
+      "cityPlaceholder": "ex. São Paulo ou Curitiba",
+      "back": "Voltar",
+      "next": "Próxima etapa",
+      "submit": "Publicar Cartão de Atleta",
+      "submitting": "Publicando perfil...",
+      "successTitle": "Bem-vindo às mesas!",
+      "successDescription": "Seu perfil público agora está ativo e pronto para as partidas.",
+      "viewProfile": "Ver Meu Perfil",
+      "previewHeading": "Pré-visualização do Cartão",
+      "badgeGrip": "Empunhadura",
+      "badgeHand": "Mão",
+      "badgeRating": "Nível",
+      "errorConflict": "Este nome de usuário já está sendo usado. Escolha outro.",
+      "errorGeneric": "Ocorreu um erro ao criar seu perfil. Tente novamente."
+    },
+    "public": {
+      "memberSince": "Membro desde",
+      "active": "Jogador Ativo",
+      "bio": "Biografia do Jogador",
+      "location": "Local do Centro de Treinamento",
+      "instagram": "Instagram",
+      "matchHistoryTab": "Histórico de Partidas",
+      "clubsTab": "Clubes e Equipes",
+      "eventsTab": "Torneios",
+      "noBio": "Nenhuma biografia adicionada ainda.",
+      "noMatches": "Nenhuma partida pública registrada ainda.",
+      "noClubs": "Sem filiação a clube público no momento.",
+      "noEvents": "Nenhum evento público próximo.",
+      "shareProfile": "Compartilhar Perfil",
+      "editProfile": "Editar Perfil",
+      "notFoundTitle": "Jogador não encontrado",
+      "notFoundDescription": "Não encontramos uma ficha pública com este handle. O jogador pode ter configurado o perfil como privado ou alterado o nome de usuário.",
+      "backToDirectory": "Voltar para Perfis"
+    }
+  },
   "common": {
     "comingSoon": "Rota base pronta para implementação",
     "localeSwitch": "Trocar idioma"

@@ -4,6 +4,8 @@ import { Link } from "@/i18n/navigation";
 import { usePathname } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
+import { cn } from "@/lib/utils";
+
 type LocaleSwitcherProps = {
   locale: AppLocale;
 };
@@ -14,16 +16,18 @@ export const LocaleSwitcher = ({ locale }: LocaleSwitcherProps) => {
   const pathname = usePathname();
 
   return (
-    <div className="inline-flex items-center rounded-full border border-border bg-white/80 p-1 shadow-soft">
+    <div className="inline-flex items-center rounded-lg border border-border bg-card/60 p-1 shadow-sm">
       {localeOptions.map((option) => (
         <Link
           key={option}
           href={pathname}
           locale={option}
-          className={[
-            "rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition",
-            option === locale ? "bg-brand text-white" : "text-muted hover:text-foreground"
-          ].join(" ")}
+          className={cn(
+            "rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider transition-colors",
+            option === locale
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
         >
           {option}
         </Link>

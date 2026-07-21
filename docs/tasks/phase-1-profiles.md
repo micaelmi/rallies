@@ -8,12 +8,12 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 
 | Task ID | Task Title | Category | Status | Module / Area |
 | :--- | :--- | :--- | :--- | :--- |
-| **[P1-DEV-01]** | Profile Schemas & Domain Contracts | Dev | `[ ]` PENDING | `backend/profiles` |
-| **[P1-DEV-02]** | Profile Repository & Database Queries | Dev | `[ ]` PENDING | `backend/profiles` |
-| **[P1-DEV-03]** | Profile Service & Privacy Orchestration | Dev | `[ ]` PENDING | `backend/profiles` |
-| **[P1-DEV-04]** | Profile Controller & Route Registration | Dev | `[ ]` PENDING | `backend/profiles` |
-| **[P1-DEV-05]** | Frontend Onboarding & Profile Setup Flow | Dev | `[ ]` PENDING | `frontend/profiles` |
-| **[P1-DEV-06]** | Public Profile Page & SEO Shell (`/profiles/[slug]`) | Dev | `[ ]` PENDING | `frontend/profiles` |
+| **[P1-DEV-01]** | Profile Schemas & Domain Contracts | Dev | `[x]` FINISHED | `backend/profiles` |
+| **[P1-DEV-02]** | Profile Repository & Database Queries | Dev | `[x]` FINISHED | `backend/profiles` |
+| **[P1-DEV-03]** | Profile Service & Privacy Orchestration | Dev | `[x]` FINISHED | `backend/profiles` |
+| **[P1-DEV-04]** | Profile Controller & Route Registration | Dev | `[x]` FINISHED | `backend/profiles` |
+| **[P1-DEV-05]** | Frontend Onboarding & Profile Setup Flow | Dev | `[x]` FINISHED | `frontend/profiles` |
+| **[P1-DEV-06]** | Public Profile Page & SEO Shell (`/profiles/[slug]`) | Dev | `[x]` FINISHED | `frontend/profiles` |
 | **[P1-REV-01]** | Profile Architecture & Privacy Security Review | Review | `[ ]` PENDING | `backend/profiles` |
 | **[P1-TST-01]** | Profile Backend Unit & Integration Tests | Test | `[ ]` PENDING | `backend/profiles` |
 | **[P1-TST-02]** | Profile E2E Playwright Suite | Test | `[ ]` PENDING | `frontend/profiles` |
@@ -24,93 +24,93 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 ## Detailed Task Specifications
 
 ### [P1-DEV-01] Profile Schemas & Domain Contracts
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `backend/src/modules/profiles/profiles.schemas.ts`, `profiles.types.ts`
 - **Objective**: Define explicit Zod schemas for all profile endpoints (`getProfileBySlug`, `updateMyProfile`) and domain interfaces before any logic is written.
 - **Deliverables & Steps**:
-  - `[ ]` Define `UpdateProfileRequestSchema` (username, displayName, bio, city, state, country, sportMetadata, visibilitySettings).
-  - `[ ]` Define `ProfileResponseSchema` ensuring sensitive internal data is excluded.
-  - `[ ]` Define `ProfileVisibilityEnum` (`PUBLIC`, `MEMBERS_ONLY`, `PRIVATE`) in language-neutral English.
+  - `[x]` Define `UpdateProfileRequestSchema` (username, displayName, bio, city, state, country, sportMetadata, visibilitySettings).
+  - `[x]` Define `ProfileResponseSchema` ensuring sensitive internal data is excluded.
+  - `[x]` Define `ProfileVisibilityEnum` (`PUBLIC`, `MEMBERS_ONLY`, `PRIVATE`) in language-neutral English.
 - **Acceptance Criteria**:
-  - `[ ]` All schemas export `z.infer<>` TypeScript types.
-  - `[ ]` Zod schemas reject unknown fields (`.strict()`).
+  - `[x]` All schemas export `z.infer<>` TypeScript types.
+  - `[x]` Zod schemas reject unknown fields (`.strict()`).
 
 ---
 
 ### [P1-DEV-02] Profile Repository & Database Queries
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `backend/src/modules/profiles/profiles.repository.ts`
 - **Objective**: Implement clean, typed database access methods using Prisma ORM without exposing Prisma types directly to the service layer.
 - **Deliverables & Steps**:
-  - `[ ]` Implement `findBySlug(slug: string)` with active profile check (`ProfileStatus.ACTIVE`).
-  - `[ ]` Implement `findByUserId(userId: string)`.
-  - `[ ]` Implement `updateByUserId(userId: string, data: UpdateProfileInput)`.
-  - `[ ]` Ensure slug collision checking logic (`isSlugTaken`).
+  - `[x]` Implement `findBySlug(slug: string)` with active profile check (`ProfileStatus.ACTIVE`).
+  - `[x]` Implement `findByUserId(userId: string)`.
+  - `[x]` Implement `updateByUserId(userId: string, data: UpdateProfileInput)`.
+  - `[x]` Ensure slug collision checking logic (`isSlugTaken`).
 - **Acceptance Criteria**:
-  - `[ ]` No raw SQL or un-indexed queries used.
-  - `[ ]` All repository returns match internal `Profile` domain types.
+  - `[x]` No raw SQL or un-indexed queries used.
+  - `[x]` All repository returns match internal `Profile` domain types.
 
 ---
 
 ### [P1-DEV-03] Profile Service & Privacy Orchestration
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `backend/src/modules/profiles/profiles.service.ts`
 - **Objective**: Implement core profile business rules, username slug sanitization, and strict location privacy filtering.
 - **Deliverables & Steps**:
-  - `[ ]` Implement `getPublicProfileBySlug(slug: string, viewerUserId?: string)`: filter output based on `visibilitySettings`.
-  - `[ ]` Enforce location privacy rules: output only `city`, `state/region`, and `country`; strip exact addresses if passed.
-  - `[ ]` Implement `updateMyProfile(userId: string, input: UpdateProfileRequest)` with slug formatting and validation.
+  - `[x]` Implement `getPublicProfileBySlug(slug: string, viewerUserId?: string)`: filter output based on `visibilitySettings`.
+  - `[x]` Enforce location privacy rules: output only `city`, `state/region`, and `country`; strip exact addresses if passed.
+  - `[x]` Implement `updateMyProfile(userId: string, input: UpdateProfileRequest)` with slug formatting and validation.
 - **Acceptance Criteria**:
-  - `[ ]` Service throws explicit domain errors (`ProfileNotFoundError`, `SlugAlreadyExistsError`) on failures.
-  - `[ ]` Privacy masking verified: `PRIVATE` profiles return 404/403 for anonymous viewers.
+  - `[x]` Service throws explicit domain errors (`ProfileNotFoundError`, `SlugAlreadyExistsError`) on failures.
+  - `[x]` Privacy masking verified: `PRIVATE` profiles return 404/403 for anonymous viewers.
 
 ---
 
 ### [P1-DEV-04] Profile Controller & Route Registration
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `backend/src/modules/profiles/profiles.controller.ts`, `profiles.routes.ts`
 - **Objective**: Create Fastify route handlers with typed Zod validation using `fastify-type-provider-zod`.
 - **Deliverables & Steps**:
-  - `[ ]` Register `GET /api/v1/profiles/:slug` with `schema: { params: GetProfileParamsSchema, response: { 200: ProfileResponseSchema } }`.
-  - `[ ]` Register `PUT /api/v1/profiles/me` protected by authentication hook (`checkAuth`).
-  - `[ ]` Ensure `profiles.routes.ts` is exported and linked inside `src/plugins/routes.ts`.
+  - `[x]` Register `GET /api/v1/profiles/:slug` with `schema: { params: GetProfileParamsSchema, response: { 200: ProfileResponseSchema } }`.
+  - `[x]` Register `PUT /api/v1/profiles/me` protected by authentication hook (`checkAuth`).
+  - `[x]` Ensure `profiles.routes.ts` is exported and linked inside `src/plugins/routes.ts`.
 - **Acceptance Criteria**:
-  - `[ ]` Zero Prisma calls directly inside `profiles.controller.ts`.
-  - `[ ]` Standardized error response structure returned on HTTP 400, 401, 404.
+  - `[x]` Zero Prisma calls directly inside `profiles.controller.ts`.
+  - `[x]` Standardized error response structure returned on HTTP 400, 401, 404.
 
 ---
 
 ### [P1-DEV-05] Frontend Onboarding & Profile Setup Flow
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `frontend/src/app/[locale]/(app)/profiles/setup/`, `frontend/src/components/profiles/`
 - **Objective**: Build a responsive, mobile-first profile completion wizard post-signup using `shadcn/ui` and `Tailwind CSS`.
 - **Deliverables & Steps**:
-  - `[ ]` Create form fields: Username/Slug picker (with debounce check), Display Name, Sport metadata (table tennis grip style, dominant hand, rating).
-  - `[ ]` Implement location selector (`city`, `state`, `country`).
-  - `[ ]` Add translation keys in `frontend/src/messages/en.json` and `pt-BR.json` (`profiles.setup.title`, `profiles.setup.submit`, etc.).
+  - `[x]` Create form fields: Username/Slug picker (with debounce check), Display Name, Sport metadata (table tennis grip style, dominant hand, rating).
+  - `[x]` Implement location selector (`city`, `state`, `country`).
+  - `[x]` Add translation keys in `frontend/src/messages/en.json` and `pt-BR.json` (`profiles.setup.title`, `profiles.setup.submit`, etc.).
 - **Acceptance Criteria**:
-  - `[ ]` Form validates client-side and handles backend 409 (`SlugAlreadyExists`) cleanly.
-  - `[ ]` Works seamlessly across desktop and mobile screens.
+  - `[x]` Form validates client-side and handles backend 409 (`SlugAlreadyExists`) cleanly.
+  - `[x]` Works seamlessly across desktop and mobile screens.
 
 ---
 
 ### [P1-DEV-06] Public Profile Page & SEO Shell (`/profiles/[slug]`)
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Development`
 - **Module / Area**: `frontend/src/app/[locale]/(app)/profiles/[slug]/page.tsx`
 - **Objective**: Implement server-rendered public profile pages optimized for SEO, fast loading, and visual excellence.
 - **Deliverables & Steps**:
-  - `[ ]` Fetch profile data server-side using Next.js App Router (`async function Page({ params })`).
-  - `[ ]` Generate dynamic OpenGraph (`generateMetadata`) tags (`og:title`, `og:description`, `og:image`).
-  - `[ ]` Render rich sport card showing player bio, country/city badge, and club affiliation if public.
+  - `[x]` Fetch profile data server-side using Next.js App Router (`async function Page({ params })`).
+  - `[x]` Generate dynamic OpenGraph (`generateMetadata`) tags (`og:title`, `og:description`, `og:image`).
+  - `[x]` Render rich sport card showing player bio, country/city badge, and club affiliation if public.
 - **Acceptance Criteria**:
-  - `[ ]` Page achieves fast load times and proper fallback for missing profiles (`notFound()`).
-  - `[ ]` No hardcoded UI strings; all labels use `next-intl` (`t('profile.memberSince')`).
+  - `[x]` Page achieves fast load times and proper fallback for missing profiles (`notFound()`).
+  - `[x]` No hardcoded UI strings; all labels use `next-intl` (`t('profile.memberSince')`).
 
 ---
 

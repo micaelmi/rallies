@@ -49,24 +49,24 @@ export type ProfileUserRecord = {
 
 export type CreateProfileRepositoryInput = {
   username: string;
-  city?: string;
-  state?: string;
+  city?: string | undefined;
+  state?: string | undefined;
   country: string;
-  instagramUrl?: string;
-  description?: string;
+  instagramUrl?: string | undefined;
+  description?: string | undefined;
   preferredLocale: string;
   status: ProfileStatus;
 };
 
 export type UpdateProfileRepositoryInput = {
-  username?: string;
-  city?: string | null;
-  state?: string | null;
-  country?: string;
-  instagramUrl?: string | null;
-  description?: string | null;
-  preferredLocale?: string;
-  status?: ProfileStatus;
+  username?: string | undefined;
+  city?: string | null | undefined;
+  state?: string | null | undefined;
+  country?: string | undefined;
+  instagramUrl?: string | null | undefined;
+  description?: string | null | undefined;
+  preferredLocale?: string | undefined;
+  status?: ProfileStatus | undefined;
 };
 
 export interface ProfilesRepository {
