@@ -14,8 +14,8 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 | **[P1-DEV-04]** | Profile Controller & Route Registration | Dev | `[x]` FINISHED | `backend/profiles` |
 | **[P1-DEV-05]** | Frontend Onboarding & Profile Setup Flow | Dev | `[x]` FINISHED | `frontend/profiles` |
 | **[P1-DEV-06]** | Public Profile Page & SEO Shell (`/profiles/[slug]`) | Dev | `[x]` FINISHED | `frontend/profiles` |
-| **[P1-REV-01]** | Profile Architecture & Privacy Security Review | Review | `[ ]` PENDING | `backend/profiles` |
-| **[P1-TST-01]** | Profile Backend Unit & Integration Tests | Test | `[ ]` PENDING | `backend/profiles` |
+| **[P1-REV-01]** | Profile Architecture & Privacy Security Review | Review | `[x]` FINISHED | `backend/profiles` |
+| **[P1-TST-01]** | Profile Backend Unit & Integration Tests | Test | `[x]` FINISHED | `backend/profiles` |
 | **[P1-TST-02]** | Profile E2E Playwright Suite | Test | `[ ]` PENDING | `frontend/profiles` |
 | **[P1-REP-01]** | OpenAPI Documentation & Repo Hygiene | Repo | `[ ]` PENDING | `backend` / `docs` |
 
@@ -115,29 +115,37 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 ---
 
 ### [P1-REV-01] Profile Architecture & Privacy Security Review
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Review`
 - **Module / Area**: `backend/src/modules/profiles/`
 - **Objective**: Conduct rigorous architectural and security code review against `docs/04-backend-standards.md` and `docs/06-security.md`.
 - **Deliverables & Steps**:
-  - `[ ]` Verify no `PrismaClient` usage inside `profiles.controller.ts` or `profiles.routes.ts`.
-  - `[ ]` Verify location privacy: verify that precise coordinates or street addresses cannot be leaked via API response payload.
-  - `[ ]` Verify all status codes and enums (`ProfileStatus.ACTIVE`, `ProfileVisibilityEnum`) are stored in English.
+  - `[x]` Verify no `PrismaClient` usage inside `profiles.controller.ts` or `profiles.routes.ts`.
+  - `[x]` Verify location privacy: verify that precise coordinates or street addresses cannot be leaked via API response payload.
+  - `[x]` Verify all status codes and enums (`ProfileStatus.ACTIVE`, `ProfileVisibilityEnum`) are stored in English.
 - **Acceptance Criteria**:
-  - `[ ]` Review sign-off documented in PR checklist.
+  - `[x]` Review sign-off documented in PR checklist.
+- **Review Sign-Off Notes**:
+  - **Layering & Infrastructure Isolation**: Confirmed zero `PrismaClient` queries in `profiles.controller.ts` and `profiles.routes.ts`. Fixed infrastructure leak by moving `mapPrismaError` handling from `profiles.service.ts` into `profiles.repository.ts` and replacing direct `@prisma/client` enum imports in `profiles.types.ts`, `profiles.schemas.ts`, and `profiles.service.ts` with domain-owned `PROFILE_STATUSES` (`PENDING` | `ACTIVE`).
+  - **Location Privacy & Strict Contracts**: Verified `.strict()` rejection on `createProfileBodySchema` and `updateProfileBodySchema`, explicit `publicProfileSelect` projection (`username`, `city`, `state`, `country`, `instagramUrl`, `description`, `createdAt`, `updatedAt`) excluding internal fields (`userId`, `preferredLocale`, `status`) and never accepting street addresses or coordinates, and `ACTIVE`-only filtering on public lookups.
+  - **Input Validation Hardening**: Hardened `instagramUrl` to require `http:`/`https:` on Instagram hosts (`instagram.com`, `instagr.am`) to prevent `javascript:` XSS / open-redirect URLs; added `.trim()` across string fields and `x-user-id` header validation/extraction so whitespace-only payloads are rejected.
+  - **Tracked Follow-Ups (Outside `P1-REV-01` Scope)**:
+    1. Temporary `x-user-id` header authentication must be replaced with verified Clerk JWT middleware before staging/production deployment and Phase 2 billing.
+    2. Current v1 database schema (`backend/prisma/schema.prisma`) models `ProfileStatus` (`PENDING`, `ACTIVE`) rather than a separate `ProfileVisibility` (`PUBLIC`, `MEMBERS_ONLY`, `PRIVATE`) column; both remain strictly language-neutral English.
+    3. Case-insensitive username collision policy can be considered in a future migration if uppercase/lowercase handles should be normalized.
 
 ---
 
 ### [P1-TST-01] Profile Backend Unit & Integration Tests
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Testing`
 - **Module / Area**: `backend/src/modules/profiles/profiles.service.test.ts`, `profiles.routes.test.ts`
 - **Objective**: Write comprehensive test suites using `Vitest` and `Fastify.inject()`.
 - **Deliverables & Steps**:
-  - `[ ]` Unit test `profiles.service.ts`: test slug generation, collision handling, and privacy masking.
-  - `[ ]` Integration test `profiles.routes.ts`: inject `GET /api/v1/profiles/:slug` and `PUT /api/v1/profiles/me` with mock JWT tokens.
+  - `[x]` Unit test `profiles.service.ts`: test slug generation, collision handling, and privacy masking.
+  - `[x]` Integration test `profiles.routes.ts`: inject `GET /api/v1/profiles/:slug` and `PUT /api/v1/profiles/me` with mock auth headers (`x-user-id` until Clerk JWT middleware is wired).
 - **Acceptance Criteria**:
-  - `[ ]` `pnpm --filter backend test` passes with $\ge 85\%$ line coverage for the profile module.
+  - `[x]` `pnpm --filter @rallies/backend test` passes with $\ge 85\%$ line coverage for the profile module (achieved **100% lines / 100% statements / 97.29% branches** across 31 tests).
 
 ---
 

@@ -8,6 +8,8 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
@@ -20,11 +22,11 @@
   },
   "dependencies": {
     "@clerk/backend": "^3.2.11",
-    "@prisma/adapter-pg": "^7.7.0",
     "@fastify/cors": "^11.2.0",
     "@fastify/sensible": "^6.0.4",
     "@fastify/swagger": "^9.7.0",
     "@fastify/swagger-ui": "^5.2.5",
+    "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
@@ -38,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.0",
+    "@vitest/coverage-v8": "^5.1.1",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.5.0",
@@ -45,6 +48,7 @@
     "prisma": "^7.7.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.2"
+    "typescript-eslint": "^8.58.2",
+    "vitest": "^5.1.1"
   }
 }

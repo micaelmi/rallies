@@ -1,6 +1,4 @@
-import { ProfileStatus } from "@prisma/client";
 import { AppError } from "../../shared/errors/app-error.js";
-import { mapPrismaError } from "../../infra/database/prisma-errors.js";
 import type {
   CreateProfileInput,
   ProfilesRepository,
@@ -55,21 +53,17 @@ export class ProfilesService {
       });
     }
 
-    try {
-      return await this.profilesRepository.createProfile(userId, {
-        ...input,
-        username: trimmedUsername,
-        city: input.city ? input.city.trim() : undefined,
-        state: input.state ? input.state.trim() : undefined,
-        country: input.country.trim(),
-        instagramUrl: input.instagramUrl ? input.instagramUrl.trim() : undefined,
-        description: input.description ? input.description.trim() : undefined,
-        preferredLocale: input.preferredLocale ?? fallbackLocale,
-        status: ProfileStatus.ACTIVE
-      });
-    } catch (error) {
-      mapPrismaError(error);
-    }
+    return this.profilesRepository.createProfile(userId, {
+      ...input,
+      username: trimmedUsername,
+      city: input.city ? input.city.trim() : undefined,
+      state: input.state ? input.state.trim() : undefined,
+      country: input.country.trim(),
+      instagramUrl: input.instagramUrl ? input.instagramUrl.trim() : undefined,
+      description: input.description ? input.description.trim() : undefined,
+      preferredLocale: input.preferredLocale ?? fallbackLocale,
+      status: "ACTIVE"
+    });
   }
 
   public async updateOwnProfile(userId: string, input: UpdateProfileInput) {
@@ -105,23 +99,16 @@ export class ProfilesService {
       }
     }
 
-    try {
-      return await this.profilesRepository.updateProfile(userId, {
-        ...input,
-        username: trimmedUsername,
-        city: trimOptional(input.city),
-        state: trimOptional(input.state),
-        country: input.country !== undefined ? input.country.trim() : undefined,
-        instagramUrl: trimOptional(input.instagramUrl),
-        description: trimOptional(input.description),
-        status:
-          currentProfile.status === ProfileStatus.PENDING
-            ? ProfileStatus.ACTIVE
-            : undefined
-      });
-    } catch (error) {
-      mapPrismaError(error);
-    }
+    return this.profilesRepository.updateProfile(userId, {
+      ...input,
+      username: trimmedUsername,
+      city: trimOptional(input.city),
+      state: trimOptional(input.state),
+      country: input.country !== undefined ? input.country.trim() : undefined,
+      instagramUrl: trimOptional(input.instagramUrl),
+      description: trimOptional(input.description),
+      status: currentProfile.status === "PENDING" ? "ACTIVE" : undefined
+    });
   }
 
   public async getOwnProfile(userId: string) {

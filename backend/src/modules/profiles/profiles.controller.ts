@@ -29,7 +29,7 @@ type PublicProfileRequest = FastifyRequest<{
 const getAuthenticatedUserId = (
   request: AuthenticatedProfileRequest
 ): string => {
-  const userId = request.headers["x-user-id"];
+  const userId = request.headers["x-user-id"]?.trim();
 
   if (!userId) {
     throw new AppError({

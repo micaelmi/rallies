@@ -1,5 +1,6 @@
 import type { PrismaClient, Prisma } from "@prisma/client";
-import { ProfileStatus } from "@prisma/client";
+import { ProfileStatus as PrismaProfileStatus } from "@prisma/client";
+import { mapPrismaError } from "../../infra/database/prisma-errors.js";
 import type {
   CreateProfileRepositoryInput,
   OwnProfile,
@@ -161,7 +162,7 @@ export class PrismaProfilesRepository implements ProfilesRepository {
     const profile = await this.prisma.profile.findFirst({
       where: {
         username,
-        status: ProfileStatus.ACTIVE
+        status: PrismaProfileStatus.ACTIVE
       },
       select: publicProfileSelect
     });
@@ -177,34 +178,42 @@ export class PrismaProfilesRepository implements ProfilesRepository {
     userId: string,
     input: CreateProfileRepositoryInput
   ): Promise<OwnProfile> {
-    const profile = await this.prisma.profile.create({
-      data: {
-        userId,
-        username: input.username,
-        city: input.city ?? null,
-        state: input.state ?? null,
-        country: input.country,
-        instagramUrl: input.instagramUrl ?? null,
-        description: input.description ?? null,
-        preferredLocale: input.preferredLocale,
-        status: input.status
-      },
-      select: ownProfileSelect
-    });
+    try {
+      const profile = await this.prisma.profile.create({
+        data: {
+          userId,
+          username: input.username,
+          city: input.city ?? null,
+          state: input.state ?? null,
+          country: input.country,
+          instagramUrl: input.instagramUrl ?? null,
+          description: input.description ?? null,
+          preferredLocale: input.preferredLocale,
+          status: input.status
+        },
+        select: ownProfileSelect
+      });
 
-    return toOwnProfile(profile);
+      return toOwnProfile(profile);
+    } catch (error) {
+      return mapPrismaError(error);
+    }
   }
 
   public async updateProfile(
     userId: string,
     input: UpdateProfileRepositoryInput
   ): Promise<OwnProfile> {
-    const profile = await this.prisma.profile.update({
-      where: { userId },
-      data: buildProfileUpdateData(input),
-      select: ownProfileSelect
-    });
+    try {
+      const profile = await this.prisma.profile.update({
+        where: { userId },
+        data: buildProfileUpdateData(input),
+        select: ownProfileSelect
+      });
 
-    return toOwnProfile(profile);
+      return toOwnProfile(profile);
+    } catch (error) {
+      return mapPrismaError(error);
+    }
   }
 }

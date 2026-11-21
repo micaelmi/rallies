@@ -1,25 +1,31 @@
-import { ProfileStatus } from "@prisma/client";
 import { z } from "zod";
 import { errorResponseSchema } from "../../shared/http/error-schemas.js";
 import { localeHeaderSchema } from "../../shared/http/locale-header-schema.js";
 import { supportedLocales } from "../../shared/i18n/locale-context.js";
+import { PROFILE_STATUSES } from "./profiles.types.js";
 
 const profileFields = {
   username: z
     .string()
+    .trim()
     .min(3)
     .max(30)
     .regex(/^[a-zA-Z0-9_]+$/),
-  city: z.string().min(1).max(120),
-  state: z.string().min(1).max(120),
-  country: z.string().min(1).max(120),
-  instagramUrl: z.url().max(2048),
-  description: z.string().max(2000),
+  city: z.string().trim().min(1).max(120),
+  state: z.string().trim().min(1).max(120),
+  country: z.string().trim().min(1).max(120),
+  instagramUrl: z
+    .url({
+      protocol: /^https?$/,
+      hostname: /^(www\.)?(instagram\.com|instagr\.am)$/i
+    })
+    .max(2048),
+  description: z.string().trim().max(2000),
   preferredLocale: z.enum(supportedLocales)
 };
 
 export const profileAuthenticatedHeadersSchema = localeHeaderSchema.extend({
-  "x-user-id": z.string().min(1).max(191).optional()
+  "x-user-id": z.string().trim().min(1).max(191).optional()
 });
 
 export const createProfileBodySchema = z
@@ -62,7 +68,7 @@ export const ownProfileResponseSchema = z.object({
   instagramUrl: z.string().nullable(),
   description: z.string().nullable(),
   preferredLocale: z.enum(supportedLocales),
-  status: z.nativeEnum(ProfileStatus),
+  status: z.enum(PROFILE_STATUSES),
   createdAt: z.date(),
   updatedAt: z.date()
 });

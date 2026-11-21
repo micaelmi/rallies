@@ -1,4 +1,3 @@
-import type { ProfileStatus } from "@prisma/client";
 import type { z } from "zod";
 import type {
   createProfileBodySchema,
@@ -6,6 +5,10 @@ import type {
   publicProfileParamsSchema,
   updateProfileBodySchema
 } from "./profiles.schemas.js";
+
+export const PROFILE_STATUSES = ["PENDING", "ACTIVE"] as const;
+
+export type ProfileStatus = (typeof PROFILE_STATUSES)[number];
 
 export type CreateProfileInput = z.infer<typeof createProfileBodySchema>;
 
