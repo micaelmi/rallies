@@ -4,4 +4,7 @@ out
 .env
 .env.*
 coverage
+playwright-report
+test-results
+.turbo
 .DS_Store

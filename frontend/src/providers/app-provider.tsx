@@ -10,7 +10,7 @@ type AppProviderProps = PropsWithChildren<{
 
 export const AppProvider = ({ children, locale, messages }: AppProviderProps) => {
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
       {children}
     </NextIntlClientProvider>
   );

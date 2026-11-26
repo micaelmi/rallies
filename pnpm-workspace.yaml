@@ -1,3 +1,9 @@
 packages:
   - backend
   - frontend
+
+onlyBuiltDependencies:
+  - "@clerk/shared"
+  - "@prisma/engines"
+  - esbuild
+  - prisma

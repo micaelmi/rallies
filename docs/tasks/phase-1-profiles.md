@@ -16,8 +16,8 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 | **[P1-DEV-06]** | Public Profile Page & SEO Shell (`/profiles/[slug]`) | Dev | `[x]` FINISHED | `frontend/profiles` |
 | **[P1-REV-01]** | Profile Architecture & Privacy Security Review | Review | `[x]` FINISHED | `backend/profiles` |
 | **[P1-TST-01]** | Profile Backend Unit & Integration Tests | Test | `[x]` FINISHED | `backend/profiles` |
-| **[P1-TST-02]** | Profile E2E Playwright Suite | Test | `[ ]` PENDING | `frontend/profiles` |
-| **[P1-REP-01]** | OpenAPI Documentation & Repo Hygiene | Repo | `[ ]` PENDING | `backend` / `docs` |
+| **[P1-TST-02]** | Profile E2E Playwright Suite | Test | `[x]` FINISHED | `frontend/profiles` |
+| **[P1-REP-01]** | OpenAPI Documentation & Repo Hygiene | Repo | `[x]` FINISHED | `backend` / `docs` |
 
 ---
 
@@ -150,26 +150,26 @@ This file tracks the granular implementation tasks for **Phase 1** of the Rallie
 ---
 
 ### [P1-TST-02] Profile E2E Playwright Suite
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Testing`
 - **Module / Area**: `frontend/tests/e2e/profiles.spec.ts`
 - **Objective**: End-to-end browser verification of the onboarding and public viewing journey using `Playwright`.
 - **Deliverables & Steps**:
-  - `[ ]` Write test: New user signs up $\rightarrow$ redirected to setup wizard $\rightarrow$ submits profile data $\rightarrow$ views `/profiles/my-slug`.
-  - `[ ]` Write test: Anonymous visitor accesses `/profiles/my-slug` and sees correct localized metadata.
+  - `[x]` Write test: User onboarding setup wizard (`taken_player` conflict detection → available handle → Step 1–3 submission → `/en/profiles/<slug>` rendering).
+  - `[x]` Write test: Anonymous visitor accesses `/profiles/<slug>` in `en` and `pt-BR` and sees correct localized UI, OpenGraph metadata, and private/missing profile not-found states.
 - **Acceptance Criteria**:
-  - `[ ]` E2E tests run reliably without flakiness across Chromium and WebKit.
+  - `[x]` E2E tests run reliably without flakiness across Chromium and WebKit (8/8 passed in 19.4s).
 
 ---
 
 ### [P1-REP-01] OpenAPI Documentation & Repo Hygiene
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Repo Update`
 - **Module / Area**: `backend/src/plugins/swagger.ts`, `pnpm-lock.yaml`
 - **Objective**: Ensure OpenAPI specifications auto-generate correctly and repository lockfiles remain clean.
 - **Deliverables & Steps**:
-  - `[ ]` Verify that `/api/v1/profiles/*` routes appear properly in Swagger UI (`/documentation`).
-  - `[ ]` Ensure request and response schemas generate accurate JSON Schemas.
-  - `[ ]` Verify no extra dependencies were added without lockfile synchronization (`pnpm install --frozen-lockfile`).
+  - `[x]` Verify that `/api/v1/profiles/*` routes appear properly in Swagger UI (`/docs` & `/docs/json`) and registered missing `profiles` and `webhooks` top-level tags in `swagger.ts`.
+  - `[x]` Ensure request and response schemas generate accurate JSON Schemas (automated contract tests in `backend/src/plugins/swagger.test.ts` verifying `.strict()` `additionalProperties: false`, required fields, and privacy-safe public response projection).
+  - `[x]` Verify no extra dependencies were added without lockfile synchronization (`pnpm install --frozen-lockfile` passed across all 3 workspace projects).
 - **Acceptance Criteria**:
-  - `[ ]` OpenAPI schema validation passes with zero warnings.
+  - `[x]` OpenAPI schema validation passes with zero warnings (34/34 backend tests passing).

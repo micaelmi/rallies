@@ -7,7 +7,7 @@
     "dev:frontend": "pnpm --filter ./frontend dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "db:up": "docker compose up -d",
+    "db:up": "docker compose up -d rallies-postgres-db",
     "db:down": "docker compose down"
   }
 }

@@ -18,6 +18,7 @@ import {
   EyeOff
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getApiBaseUrl } from "@/lib/api/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -92,7 +93,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
     setUsernameStatus("checking");
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/v1/profiles/${cleanUsername}`);
+        const res = await fetch(`${getApiBaseUrl()}/profiles/${encodeURIComponent(cleanUsername)}`);
         if (res.status === 200) {
           setUsernameStatus("taken");
         } else {
@@ -127,6 +128,10 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step !== 3) {
+      handleNextStep();
+      return;
+    }
     if (usernameStatus === "taken" || usernameStatus === "invalid") {
       setStep(1);
       setSubmitError(t("errorConflict"));
@@ -165,7 +170,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
     };
 
     try {
-      const res = await fetch("/api/v1/profiles", {
+      const res = await fetch(`${getApiBaseUrl()}/profiles`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -573,6 +578,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
 
                 {step < 3 ? (
                   <Button
+                    key="next-step-button"
                     type="button"
                     onClick={handleNextStep}
                     disabled={usernameStatus === "invalid" || usernameStatus === "checking" || !username.trim()}
@@ -583,6 +589,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                   </Button>
                 ) : (
                   <Button
+                    key="submit-profile-button"
                     type="submit"
                     disabled={isSubmitting}
                     className="gap-2"

@@ -20,7 +20,9 @@ export const swaggerPlugin = fp(async (app) => {
         : [],
       tags: [
         { name: "system", description: "Technical and operational routes" },
-        { name: "identity", description: "Identity and profile bootstrap routes" }
+        { name: "identity", description: "Identity and profile bootstrap routes" },
+        { name: "profiles", description: "Public and authenticated player profile routes" },
+        { name: "webhooks", description: "Third-party provider webhook endpoints" }
       ]
     },
     transform: jsonSchemaTransform
