@@ -6,6 +6,8 @@ import {
   type ZodTypeProvider
 } from "fastify-type-provider-zod";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { AppEnv } from "../../config/env.js";
+import { authPlugin } from "../../plugins/auth.js";
 import { errorHandlerPlugin } from "../../plugins/error-handler.js";
 import { localeContextPlugin } from "../../plugins/locale-context.js";
 import { registerProfilesRoutes } from "./profiles.routes.js";
@@ -13,6 +15,7 @@ import type { ProfileStatus } from "./profiles.types.js";
 
 type StoredUser = {
   id: string;
+  clerkUserId: string;
   email: string;
 };
 
@@ -29,6 +32,15 @@ type StoredProfile = {
   status: ProfileStatus;
   createdAt: Date;
   updatedAt: Date;
+};
+
+const testEnv: AppEnv = {
+  NODE_ENV: "test",
+  HOST: "127.0.0.1",
+  PORT: 3344,
+  LOG_LEVEL: "silent",
+  DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/rallies",
+  CLERK_SECRET_KEY: "sk_test_mock"
 };
 
 const pickFields = <T extends Record<string, unknown>>(
@@ -54,6 +66,15 @@ const createInMemoryPrisma = () => {
   let forceNextCreateConflict = false;
   let forceNextUpdateConflict = false;
 
+  const findUserByClerkUserId = (clerkUserId: string): StoredUser | undefined => {
+    for (const user of users.values()) {
+      if (user.clerkUserId === clerkUserId) {
+        return user;
+      }
+    }
+    return undefined;
+  };
+
   const findProfileByUsername = (username: string): StoredProfile | undefined => {
     for (const profile of profilesByUserId.values()) {
       if (profile.username === username) {
@@ -68,17 +89,44 @@ const createInMemoryPrisma = () => {
       findUnique: async ({
         where
       }: {
-        where: { id: string };
+        where: { id?: string; clerkUserId?: string };
       }) => {
-        const user = users.get(where.id);
+        const user = where.id
+          ? users.get(where.id)
+          : where.clerkUserId
+            ? findUserByClerkUserId(where.clerkUserId)
+            : undefined;
         if (!user) {
           return null;
         }
         const profile = profilesByUserId.get(user.id);
         return {
           id: user.id,
+          clerkUserId: user.clerkUserId,
+          email: user.email,
           profile: profile ? { id: profile.id } : null
         };
+      },
+      upsert: async ({
+        where,
+        create
+      }: {
+        where: { clerkUserId: string };
+        update: { email: string };
+        create: { clerkUserId: string; email: string };
+      }) => {
+        const existing = findUserByClerkUserId(where.clerkUserId);
+        if (existing) {
+          existing.email = create.email;
+          return existing;
+        }
+        const created: StoredUser = {
+          id: `user_${users.size + 1}`,
+          clerkUserId: where.clerkUserId,
+          email: create.email
+        };
+        users.set(created.id, created);
+        return created;
       }
     },
     profile: {
@@ -205,14 +253,23 @@ describe("Profiles routes integration", () => {
 
   beforeEach(async () => {
     db = createInMemoryPrisma();
-    db.seedUser({ id: "user_1", email: "hugo@example.com" });
-    db.seedUser({ id: "user_2", email: "bruna@example.com" });
+    db.seedUser({ id: "user_1", clerkUserId: "clerk_1", email: "hugo@example.com" });
+    db.seedUser({ id: "user_2", clerkUserId: "clerk_2", email: "bruna@example.com" });
 
     app = Fastify({ logger: false }).withTypeProvider<ZodTypeProvider>();
     app.setValidatorCompiler(validatorCompiler);
     app.setSerializerCompiler(serializerCompiler);
+    app.decorate("config", testEnv);
     app.decorate("prisma", db.prisma);
 
+    await app.register(authPlugin, {
+      verifyAuthToken: async (token: string) => {
+        if (token === "token_user_1") return { sub: "clerk_1" };
+        if (token === "token_user_2") return { sub: "clerk_2" };
+        throw new Error("Invalid token");
+      },
+      fetchClerkUserEmail: async () => null
+    });
     await app.register(localeContextPlugin);
     await app.register(errorHandlerPlugin);
     await app.register(registerProfilesRoutes, { prefix: "/api/v1" });
@@ -224,12 +281,12 @@ describe("Profiles routes integration", () => {
   });
 
   describe("POST /api/v1/profiles", () => {
-    it("creates a profile with x-user-id and uses x-locale fallback", async () => {
+    it("creates a profile with verified Bearer JWT and uses x-locale fallback", async () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
         headers: {
-          "x-user-id": "user_1",
+          authorization: "Bearer token_user_1",
           "x-locale": "pt-BR"
         },
         payload: {
@@ -271,12 +328,12 @@ describe("Profiles routes integration", () => {
       expect(response.json().error.code).toBe("AUTHENTICATION_REQUIRED");
     });
 
-    it("rejects whitespace-only x-user-id header with 400", async () => {
+    it("rejects invalid Bearer tokens with 401 INVALID_AUTH_TOKEN", async () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
         headers: {
-          "x-user-id": "   "
+          authorization: "Bearer invalid_token"
         },
         payload: {
           username: "hugo_tt",
@@ -284,15 +341,15 @@ describe("Profiles routes integration", () => {
         }
       });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.json().error.code).toBe("VALIDATION_ERROR");
+      expect(response.statusCode).toBe(401);
+      expect(response.json().error.code).toBe("INVALID_AUTH_TOKEN");
     });
 
     it("rejects unknown private location fields (.strict())", async () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {
           username: "hugo_tt",
           country: "Brazil",
@@ -309,7 +366,7 @@ describe("Profiles routes integration", () => {
       const xssUrlResponse = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {
           username: "hugo_tt",
           country: "Brazil",
@@ -321,7 +378,7 @@ describe("Profiles routes integration", () => {
       const nonIgUrlResponse = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {
           username: "hugo_tt",
           country: "Brazil",
@@ -333,7 +390,7 @@ describe("Profiles routes integration", () => {
       const blankCountryResponse = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {
           username: "hugo_tt",
           country: "   "
@@ -342,33 +399,18 @@ describe("Profiles routes integration", () => {
       expect(blankCountryResponse.statusCode).toBe(400);
     });
 
-    it("returns 404 when owner user does not exist", async () => {
-      const response = await app.inject({
-        method: "POST",
-        url: "/api/v1/profiles",
-        headers: { "x-user-id": "ghost_user" },
-        payload: {
-          username: "ghost_tt",
-          country: "Brazil"
-        }
-      });
-
-      expect(response.statusCode).toBe(404);
-      expect(response.json().error.code).toBe("PROFILE_OWNER_NOT_FOUND");
-    });
-
     it("returns 409 when username is already taken or user already has a profile", async () => {
       await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { username: "hugo_tt", country: "Brazil" }
       });
 
       const duplicateOwner = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { username: "hugo_tt_2", country: "Brazil" }
       });
       expect(duplicateOwner.statusCode).toBe(409);
@@ -377,7 +419,7 @@ describe("Profiles routes integration", () => {
       const duplicateHandle = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_2" },
+        headers: { authorization: "Bearer token_user_2" },
         payload: { username: "hugo_tt", country: "Brazil" }
       });
       expect(duplicateHandle.statusCode).toBe(409);
@@ -392,7 +434,7 @@ describe("Profiles routes integration", () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/v1/profiles",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { username: "race_handle", country: "Brazil" }
       });
 
@@ -421,7 +463,7 @@ describe("Profiles routes integration", () => {
       const response = await app.inject({
         method: "GET",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" }
+        headers: { authorization: "Bearer token_user_1" }
       });
 
       expect(response.statusCode).toBe(200);
@@ -443,7 +485,7 @@ describe("Profiles routes integration", () => {
       const missing = await app.inject({
         method: "GET",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" }
+        headers: { authorization: "Bearer token_user_1" }
       });
       expect(missing.statusCode).toBe(404);
       expect(missing.json().error.code).toBe("PROFILE_NOT_FOUND");
@@ -486,7 +528,7 @@ describe("Profiles routes integration", () => {
       const response = await app.inject({
         method: "PUT",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {
           username: "hugo_active",
           city: null,
@@ -516,7 +558,7 @@ describe("Profiles routes integration", () => {
       const response = await app.inject({
         method: "PATCH",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { username: "bruna_tt" }
       });
 
@@ -528,7 +570,7 @@ describe("Profiles routes integration", () => {
       const emptyRes = await app.inject({
         method: "PUT",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: {}
       });
       expect(emptyRes.statusCode).toBe(400);
@@ -536,7 +578,7 @@ describe("Profiles routes integration", () => {
       const unknownFieldRes = await app.inject({
         method: "PUT",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { streetAddress: "999 Private Ave" }
       });
       expect(unknownFieldRes.statusCode).toBe(400);
@@ -548,7 +590,7 @@ describe("Profiles routes integration", () => {
       const response = await app.inject({
         method: "PUT",
         url: "/api/v1/profiles/me",
-        headers: { "x-user-id": "user_1" },
+        headers: { authorization: "Bearer token_user_1" },
         payload: { username: "new_race_handle" }
       });
 

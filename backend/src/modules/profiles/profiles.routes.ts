@@ -16,38 +16,6 @@ export const registerProfilesRoutes = async (
   const profilesService = new ProfilesService(profilesRepository);
   const profilesController = new ProfilesController(profilesService);
 
-  app.post(
-    "/profiles",
-    {
-      schema: createProfileRouteSchema
-    },
-    profilesController.createProfile
-  );
-
-  app.patch(
-    "/profiles/me",
-    {
-      schema: updateOwnProfileRouteSchema
-    },
-    profilesController.updateOwnProfile
-  );
-
-  app.put(
-    "/profiles/me",
-    {
-      schema: updateOwnProfileRouteSchema
-    },
-    profilesController.updateOwnProfile
-  );
-
-  app.get(
-    "/profiles/me",
-    {
-      schema: getOwnProfileRouteSchema
-    },
-    profilesController.getOwnProfile
-  );
-
   app.get(
     "/profiles/:username",
     {
@@ -55,4 +23,40 @@ export const registerProfilesRoutes = async (
     },
     profilesController.getPublicProfileByUsername
   );
+
+  await app.register(async (protectedApp) => {
+    protectedApp.addHook("preHandler", app.requireAuth);
+
+    protectedApp.post(
+      "/profiles",
+      {
+        schema: createProfileRouteSchema
+      },
+      profilesController.createProfile
+    );
+
+    protectedApp.patch(
+      "/profiles/me",
+      {
+        schema: updateOwnProfileRouteSchema
+      },
+      profilesController.updateOwnProfile
+    );
+
+    protectedApp.put(
+      "/profiles/me",
+      {
+        schema: updateOwnProfileRouteSchema
+      },
+      profilesController.updateOwnProfile
+    );
+
+    protectedApp.get(
+      "/profiles/me",
+      {
+        schema: getOwnProfileRouteSchema
+      },
+      profilesController.getOwnProfile
+    );
+  });
 };

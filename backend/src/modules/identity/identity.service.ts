@@ -156,6 +156,56 @@ export class IdentityService {
     }
   }
 
+  public async getOrSyncUserByClerkId(
+    clerkUserId: string,
+    fetchEmail: () => Promise<string | null>
+  ): Promise<{ userId: string; clerkUserId: string }> {
+    const existingUser =
+      await this.identityRepository.findUserByClerkUserId(clerkUserId);
+
+    if (existingUser) {
+      return {
+        userId: existingUser.userId,
+        clerkUserId: existingUser.clerkUserId
+      };
+    }
+
+    const email = await fetchEmail();
+
+    if (!email) {
+      throw new AppError({
+        code: "AUTHENTICATION_FAILED",
+        messageKey: "errors.auth.user_resolution_failed",
+        statusCode: 401
+      });
+    }
+
+    try {
+      await this.identityRepository.upsertUserFromClerk({
+        clerkUserId,
+        email
+      });
+    } catch (error) {
+      mapPrismaError(error);
+    }
+
+    const syncedUser =
+      await this.identityRepository.findUserByClerkUserId(clerkUserId);
+
+    if (!syncedUser) {
+      throw new AppError({
+        code: "AUTHENTICATION_FAILED",
+        messageKey: "errors.auth.user_resolution_failed",
+        statusCode: 401
+      });
+    }
+
+    return {
+      userId: syncedUser.userId,
+      clerkUserId: syncedUser.clerkUserId
+    };
+  }
+
   public async deleteUserSyncedFromClerk(clerkUserId: string) {
     const existingUser =
       await this.identityRepository.findUserByClerkUserId(clerkUserId);

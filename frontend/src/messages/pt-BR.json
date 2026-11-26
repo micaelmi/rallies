@@ -9,7 +9,10 @@
     "profiles": "Perfis",
     "clubs": "Clubes",
     "events": "Eventos",
-    "locale": "Idioma"
+    "locale": "Idioma",
+    "signIn": "Entrar",
+    "signUp": "Criar conta",
+    "myProfile": "Meu Perfil"
   },
   "landing": {
     "eyebrow": "Tênis de mesa conectado",
@@ -25,8 +28,12 @@
     }
   },
   "appHome": {
-    "title": "Início do app",
-    "description": "Este placeholder será o ponto inicial autenticado para onboarding, conclusão de perfil e ações do usuário."
+    "title": "Bem-vindo de volta, @{username}",
+    "description": "Sua ficha de atleta no Rallies está ativa. Acesse seu perfil, explore clubes ou veja os próximos torneios.",
+    "viewPublicProfile": "Ver Perfil Público",
+    "myProfile": "Meu Perfil",
+    "browseClubs": "Explorar Clubes",
+    "browseEvents": "Ver Eventos"
   },
   "placeholders": {
     "profilesIndex": {

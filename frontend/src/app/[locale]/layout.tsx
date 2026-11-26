@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ClerkProvider } from "@clerk/nextjs";
+import { enUS, ptBR } from "@clerk/localizations";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { AppProvider } from "@/providers/app-provider";
@@ -43,12 +45,28 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   const messages = await getMessages({ locale });
 
-  return (
+  const content = (
     <AppProvider locale={locale} messages={messages}>
       <div className="page-shell">
         <SiteHeader locale={locale as AppLocale} />
         {children}
       </div>
     </AppProvider>
+  );
+
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return content;
+  }
+
+  return (
+    <ClerkProvider
+      localization={locale === "pt-BR" ? ptBR : enUS}
+      signInUrl={`/${locale}/sign-in`}
+      signUpUrl={`/${locale}/sign-up`}
+      signInFallbackRedirectUrl={`/${locale}/app`}
+      signUpFallbackRedirectUrl={`/${locale}/profiles/setup`}
+    >
+      {content}
+    </ClerkProvider>
   );
 }

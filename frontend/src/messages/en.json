@@ -9,7 +9,10 @@
     "profiles": "Profiles",
     "clubs": "Clubs",
     "events": "Events",
-    "locale": "Language"
+    "locale": "Language",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "myProfile": "My Profile"
   },
   "landing": {
     "eyebrow": "Table tennis, connected",
@@ -25,8 +28,12 @@
     }
   },
   "appHome": {
-    "title": "App home",
-    "description": "This placeholder will become the authenticated starting point for onboarding, profile completion and user actions."
+    "title": "Welcome back, @{username}",
+    "description": "Your Rallies player card is active. Jump into your profile, explore clubs, or browse upcoming tournaments.",
+    "viewPublicProfile": "View Public Profile",
+    "myProfile": "My Profile Settings",
+    "browseClubs": "Browse Clubs",
+    "browseEvents": "Browse Events"
   },
   "placeholders": {
     "profilesIndex": {

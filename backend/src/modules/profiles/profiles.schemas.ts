@@ -25,7 +25,7 @@ const profileFields = {
 };
 
 export const profileAuthenticatedHeadersSchema = localeHeaderSchema.extend({
-  "x-user-id": z.string().trim().min(1).max(191).optional()
+  authorization: z.string().min(1).optional()
 });
 
 export const createProfileBodySchema = z
@@ -86,7 +86,8 @@ export const publicProfileResponseSchema = z.object({
 
 const protectedProfilesRouteBaseSchema = {
   tags: ["profiles"],
-  headers: profileAuthenticatedHeadersSchema
+  headers: profileAuthenticatedHeadersSchema,
+  security: [{ bearerAuth: [] }]
 };
 
 const publicProfilesRouteBaseSchema = {
@@ -98,7 +99,7 @@ export const createProfileRouteSchema = {
   ...protectedProfilesRouteBaseSchema,
   summary: "Create or complete the authenticated user profile",
   description:
-    "Creates the authenticated user's public profile. Temporary authentication uses the x-user-id header until real auth middleware is connected.",
+    "Creates the authenticated user's public profile using a verified Clerk Bearer JWT.",
   body: createProfileBodySchema,
   response: {
     201: ownProfileResponseSchema,
@@ -114,7 +115,7 @@ export const updateOwnProfileRouteSchema = {
   ...protectedProfilesRouteBaseSchema,
   summary: "Update the authenticated user's profile",
   description:
-    "Updates the authenticated user's own profile. Temporary authentication uses the x-user-id header until real auth middleware is connected.",
+    "Updates the authenticated user's own profile using a verified Clerk Bearer JWT.",
   body: updateProfileBodySchema,
   response: {
     200: ownProfileResponseSchema,
@@ -130,7 +131,7 @@ export const getOwnProfileRouteSchema = {
   ...protectedProfilesRouteBaseSchema,
   summary: "Get the authenticated user's profile",
   description:
-    "Returns the authenticated user's profile, including private module fields. Temporary authentication uses the x-user-id header until real auth middleware is connected.",
+    "Returns the authenticated user's profile, including private module fields, using a verified Clerk Bearer JWT.",
   response: {
     200: ownProfileResponseSchema,
     400: errorResponseSchema,

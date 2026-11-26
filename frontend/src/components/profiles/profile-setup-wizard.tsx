@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
@@ -51,7 +52,11 @@ interface ProfileSetupWizardProps {
   userId?: string;
 }
 
-export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }) => {
+const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
+const ProfileSetupWizardInner: React.FC<
+  ProfileSetupWizardProps & { getToken?: () => Promise<string | null> }
+> = ({ userId, getToken }) => {
   const t = useTranslations("profiles.setup");
   const locale = useLocale();
   const router = useRouter();
@@ -170,11 +175,13 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
     };
 
     try {
+      const token = getToken ? await getToken() : null;
       const res = await fetch(`${getApiBaseUrl()}/profiles`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(userId ? { "x-user-id": userId } : {})
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(userId && !token ? { "x-user-id": userId } : {})
         },
         body: JSON.stringify(payload)
       });
@@ -215,7 +222,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
           <Button
             onClick={() => router.push(`/${locale}/profiles/${username.trim()}`)}
             size="lg"
-            className="mt-8 gap-2"
+            className="gap-2 mt-8"
           >
             <span>{t("viewProfile")}</span>
             <ArrowRight className="w-4 h-4" />
@@ -423,7 +430,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                       <select
                         value={gripStyle}
                         onChange={(e) => setGripStyle(e.target.value as GripStyle)}
-                        className="flex h-10 w-full mt-2 px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                        className="flex bg-background mt-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring w-full h-10 text-foreground text-sm transition-colors"
                       >
                         <option value="">{t("gripStylePlaceholder")}</option>
                         <option value="shakehand">{t("gripStyles.shakehand")}</option>
@@ -439,7 +446,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                       <select
                         value={dominantHand}
                         onChange={(e) => setDominantHand(e.target.value as DominantHand)}
-                        className="flex h-10 w-full mt-2 px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                        className="flex bg-background mt-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring w-full h-10 text-foreground text-sm transition-colors"
                       >
                         <option value="">--</option>
                         <option value="right">{t("dominantHands.right")}</option>
@@ -456,7 +463,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                     <select
                       value={ratingLevel}
                       onChange={(e) => setRatingLevel(e.target.value as RatingLevel)}
-                      className="flex h-10 w-full mt-2 px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                      className="flex bg-background mt-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring w-full h-10 text-foreground text-sm transition-colors"
                     >
                       <option value="">--</option>
                       <option value="beginner">{t("ratings.beginner")}</option>
@@ -475,7 +482,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
                       placeholder={t("bioPlaceholder")}
-                      className="flex w-full mt-2 p-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground text-sm leading-6 focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                      className="flex bg-background mt-2 p-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring w-full text-foreground placeholder:text-muted-foreground text-sm leading-6 transition-colors"
                     />
                   </div>
                 </div>
@@ -497,7 +504,7 @@ export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = ({ userId }
                       <select
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        className="flex h-10 w-full mt-2 px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                        className="flex bg-background mt-2 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring w-full h-10 text-foreground text-sm transition-colors"
                       >
                         <option value="Brazil">Brazil</option>
                         <option value="United States">United States</option>
@@ -670,7 +677,7 @@ const LiveCardPreview: React.FC<LiveCardPreviewProps> = ({
     <Card className="p-6 sm:p-8 overflow-hidden transition-all">
       <div className="flex justify-between items-start gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex justify-center items-center bg-primary text-primary-foreground shadow-sm rounded-xl w-14 h-14 font-bold text-xl">
+          <div className="flex justify-center items-center bg-primary shadow-sm rounded-xl w-14 h-14 font-bold text-primary-foreground text-xl">
             {(displayName || cleanUsername).charAt(0).toUpperCase()}
           </div>
           <div>
@@ -700,7 +707,7 @@ const LiveCardPreview: React.FC<LiveCardPreviewProps> = ({
             {t(`gripStyles.${gripStyle}`)}
           </Badge>
         ) : (
-          <Badge variant="outline" className="text-muted-foreground font-normal">
+          <Badge variant="outline" className="font-normal text-muted-foreground">
             {t("badgeGrip")}
           </Badge>
         )}
@@ -710,17 +717,17 @@ const LiveCardPreview: React.FC<LiveCardPreviewProps> = ({
             {t(`dominantHands.${dominantHand}`)}
           </Badge>
         ) : (
-          <Badge variant="outline" className="text-muted-foreground font-normal">
+          <Badge variant="outline" className="font-normal text-muted-foreground">
             {t("badgeHand")}
           </Badge>
         )}
 
         {ratingLevel ? (
-          <Badge variant="default" className="bg-warning/15 text-warning border-transparent font-medium">
+          <Badge variant="default" className="bg-warning/15 border-transparent font-medium text-warning">
             🏆 {t(`ratings.${ratingLevel}`)}
           </Badge>
         ) : (
-          <Badge variant="outline" className="text-muted-foreground font-normal">
+          <Badge variant="outline" className="font-normal text-muted-foreground">
             {t("badgeRating")}
           </Badge>
         )}
@@ -728,16 +735,29 @@ const LiveCardPreview: React.FC<LiveCardPreviewProps> = ({
 
       {/* Bio Section */}
       <div className="mt-5 pt-4 border-border/60 border-t">
-        <p className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider">Bio</p>
+        <p className="font-semibold text-[11px] text-muted-foreground uppercase tracking-wider">Bio</p>
         <p className="mt-1 text-foreground/80 text-xs sm:text-sm line-clamp-4 leading-relaxed">
           {bio.trim() || "Player story will appear right here as you type in step 2..."}
         </p>
       </div>
 
       {/* Footer URL preview */}
-      <div className="bg-background/80 mt-5 px-3 py-2 border border-border/40 rounded-lg font-mono text-muted-foreground text-[11px] truncate">
+      <div className="bg-background/80 mt-5 px-3 py-2 border border-border/40 rounded-lg font-mono text-[11px] text-muted-foreground truncate">
         rallies.app/profiles/{cleanUsername}
       </div>
     </Card>
   );
+};
+
+const ClerkProfileSetupWizard: React.FC<ProfileSetupWizardProps> = (props) => {
+  const { getToken } = useAuth();
+  return <ProfileSetupWizardInner {...props} getToken={getToken} />;
+};
+
+export const ProfileSetupWizard: React.FC<ProfileSetupWizardProps> = (props) => {
+  if (isClerkConfigured) {
+    return <ClerkProfileSetupWizard {...props} />;
+  }
+
+  return <ProfileSetupWizardInner {...props} />;
 };

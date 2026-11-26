@@ -7,6 +7,7 @@ import {
 } from "fastify-type-provider-zod";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { AppEnv } from "../config/env.js";
+import { authPlugin } from "./auth.js";
 import { errorHandlerPlugin } from "./error-handler.js";
 import { localeContextPlugin } from "./locale-context.js";
 import { registerRoutes } from "./routes.js";
@@ -33,6 +34,7 @@ describe("OpenAPI & Swagger contract verification", () => {
     app.decorate("prisma", {} as PrismaClient);
 
     await app.register(swaggerPlugin);
+    await app.register(authPlugin);
     await app.register(localeContextPlugin);
     await app.register(errorHandlerPlugin);
     await app.register(registerRoutes);
@@ -53,6 +55,13 @@ describe("OpenAPI & Swagger contract verification", () => {
 
     expect(spec.openapi).toMatch(/^3\./);
     expect(spec.info?.title).toBe("Rallies Backend API");
+    expect(
+      (
+        spec as {
+          components?: { securitySchemes?: Record<string, unknown> };
+        }
+      ).components?.securitySchemes
+    ).toHaveProperty("bearerAuth");
 
     const declaredTags = new Set((spec.tags ?? []).map((tag) => tag.name));
     expect(declaredTags.has("profiles")).toBe(true);

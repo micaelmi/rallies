@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
+import { AuthControls } from "./auth-controls";
 import { LocaleSwitcher } from "./site-locale-switcher";
 import { ModeToggle } from "./mode-toggle";
 
@@ -20,12 +21,12 @@ export const SiteHeader = async ({ locale }: SiteHeaderProps) => {
   const t = await getTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-content flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+    <header className="top-0 z-20 sticky bg-background/80 backdrop-blur-md border-border border-b">
+      <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center gap-4 mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-content">
+        <div className="flex justify-between items-center gap-4">
           <Link
             href="/"
-            className="inline-flex items-center rounded-lg border border-primary/20 bg-primary/10 px-3.5 py-1.5 text-sm font-bold tracking-wider text-primary transition-colors hover:bg-primary/15"
+            className="inline-flex items-center bg-primary/10 hover:bg-primary/15 px-3.5 py-1.5 border border-primary/20 rounded-lg font-bold text-primary text-sm tracking-wider transition-colors"
           >
             RALLIES
           </Link>
@@ -35,17 +36,20 @@ export const SiteHeader = async ({ locale }: SiteHeaderProps) => {
           </div>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-muted-foreground">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-lg px-3 py-2 transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              {t(item.key)}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex flex-wrap items-center gap-3">
+          <nav className="flex flex-wrap items-center gap-1.5 font-medium text-muted-foreground text-sm">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="hover:bg-accent px-3 py-2 rounded-lg transition-colors hover:text-accent-foreground"
+              >
+                {t(item.key)}
+              </Link>
+            ))}
+          </nav>
+          <AuthControls />
+        </div>
       </div>
     </header>
   );

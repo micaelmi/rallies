@@ -23,7 +23,16 @@ export const swaggerPlugin = fp(async (app) => {
         { name: "identity", description: "Identity and profile bootstrap routes" },
         { name: "profiles", description: "Public and authenticated player profile routes" },
         { name: "webhooks", description: "Third-party provider webhook endpoints" }
-      ]
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT"
+          }
+        }
+      }
     },
     transform: jsonSchemaTransform
   });
