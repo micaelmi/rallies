@@ -65,6 +65,8 @@ describe("OpenAPI & Swagger contract verification", () => {
 
     const declaredTags = new Set((spec.tags ?? []).map((tag) => tag.name));
     expect(declaredTags.has("profiles")).toBe(true);
+    expect(declaredTags.has("clubs")).toBe(true);
+    expect(declaredTags.has("events")).toBe(true);
     expect(declaredTags.has("identity")).toBe(true);
     expect(declaredTags.has("wallet")).toBe(true);
     expect(declaredTags.has("billing")).toBe(true);
@@ -77,6 +79,24 @@ describe("OpenAPI & Swagger contract verification", () => {
     expect(paths["/api/v1/profiles/me"]?.put).toBeDefined();
     expect(paths["/api/v1/profiles/me"]?.patch).toBeDefined();
     expect(paths["/api/v1/profiles/{username}"]?.get).toBeDefined();
+    expect(
+      paths["/api/v1/clubs/"]?.get ?? paths["/api/v1/clubs"]?.get
+    ).toBeDefined();
+    expect(
+      paths["/api/v1/clubs/"]?.post ?? paths["/api/v1/clubs"]?.post
+    ).toBeDefined();
+    expect(paths["/api/v1/clubs/{id}"]?.get).toBeDefined();
+    expect(paths["/api/v1/clubs/{id}/join"]?.post).toBeDefined();
+    expect(paths["/api/v1/clubs/{id}/members/{userId}"]?.put).toBeDefined();
+    expect(
+      paths["/api/v1/events/"]?.get ?? paths["/api/v1/events"]?.get
+    ).toBeDefined();
+    expect(
+      paths["/api/v1/events/"]?.post ?? paths["/api/v1/events"]?.post
+    ).toBeDefined();
+    expect(paths["/api/v1/events/{id}"]?.get).toBeDefined();
+    expect(paths["/api/v1/events/{id}/publish"]?.post).toBeDefined();
+    expect(paths["/api/v1/events/{id}/boost"]?.post).toBeDefined();
     expect(paths["/api/v1/wallet/balance"]?.get).toBeDefined();
     expect(paths["/api/v1/wallet/history"]?.get).toBeDefined();
     expect(paths["/api/v1/billing/packages"]?.get).toBeDefined();

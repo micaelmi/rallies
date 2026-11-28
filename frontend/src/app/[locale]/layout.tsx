@@ -6,6 +6,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { AppProvider } from "@/providers/app-provider";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { ClerkAuthTokenProvider } from "@/components/shared/client-auth-token";
 import { SiteHeader } from "@/components/shared/site-header";
 
 type LocaleLayoutProps = {
@@ -66,7 +67,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       signInFallbackRedirectUrl={`/${locale}/app`}
       signUpFallbackRedirectUrl={`/${locale}/profiles/setup`}
     >
-      {content}
+      <ClerkAuthTokenProvider>{content}</ClerkAuthTokenProvider>
     </ClerkProvider>
   );
 }

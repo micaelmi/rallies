@@ -1,5 +1,9 @@
-import { getTranslations } from "next-intl/server";
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
+import { PageFrame } from "@/components/shared/page-frame";
+import {
+  ClubsDirectoryClient,
+  type ClubSummaryView
+} from "@/components/clubs/clubs-directory-client";
+import { getApiBaseUrl } from "@/lib/api/config";
 
 type ClubsPageProps = {
   params: Promise<{
@@ -9,8 +13,29 @@ type ClubsPageProps = {
 
 export default async function ClubsPage({ params }: ClubsPageProps) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "placeholders.clubsIndex" });
-  const common = await getTranslations({ locale, namespace: "common" });
 
-  return <PlaceholderPage eyebrow="Clubs" title={t("title")} description={t("description")} footer={common("comingSoon")} />;
+  let initialClubs: ClubSummaryView[] = [];
+
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/clubs`, {
+      headers: { "x-locale": locale },
+      cache: "no-store"
+    });
+    if (response.ok) {
+      const data = (await response.json().catch(() => null)) as {
+        items?: ClubSummaryView[];
+      } | null;
+      if (data?.items) {
+        initialClubs = data.items;
+      }
+    }
+  } catch {
+    initialClubs = [];
+  }
+
+  return (
+    <PageFrame className="py-10">
+      <ClubsDirectoryClient initialClubs={initialClubs} />
+    </PageFrame>
+  );
 }

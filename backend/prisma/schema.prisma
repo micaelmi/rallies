@@ -226,6 +226,9 @@ model Event {
   title           String      @db.VarChar(160)
   description     String
   imageUrl        String?     @db.VarChar(2048)
+  city            String?     @db.VarChar(120)
+  state           String?     @db.VarChar(120)
+  country         String?     @db.VarChar(120)
   address         String      @db.VarChar(255)
   mapsUrl         String?     @db.VarChar(2048)
   startAt         DateTime    @db.Timestamp(3)
@@ -233,6 +236,8 @@ model Event {
   registrationUrl String?     @db.VarChar(2048)
   createdById     String      @db.VarChar(191)
   status          EventStatus @default(DRAFT)
+  isBoosted       Boolean     @default(false)
+  boostedUntil    DateTime?   @db.Timestamp(3)
   createdAt       DateTime    @default(now()) @db.Timestamp(3)
   updatedAt       DateTime    @updatedAt @db.Timestamp(3)
 
@@ -243,6 +248,7 @@ model Event {
   @@index([createdById])
   @@index([startAt])
   @@index([status])
+  @@index([isBoosted, startAt])
 }
 
 model ClubAnnouncement {
