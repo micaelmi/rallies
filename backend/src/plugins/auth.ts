@@ -97,7 +97,8 @@ export const authPlugin = fp<AuthPluginOptions>(async (app, opts) => {
     try {
       const claims = await verifyAuthToken(token, { secretKey, jwtKey });
       clerkUserId = claims.sub;
-    } catch {
+    } catch (error) {
+      request.log.warn({ err: error }, "auth_token_verification_failed");
       throw new AppError({
         code: "INVALID_AUTH_TOKEN",
         messageKey: "errors.auth.invalid_token",

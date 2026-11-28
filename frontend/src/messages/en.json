@@ -12,7 +12,8 @@
     "locale": "Language",
     "signIn": "Sign in",
     "signUp": "Sign up",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "wallet": "Wallet"
   },
   "landing": {
     "eyebrow": "Table tennis, connected",
@@ -149,5 +150,26 @@
   "common": {
     "comingSoon": "Foundation route ready for implementation",
     "localeSwitch": "Switch locale"
+  },
+  "wallet": {
+    "eyebrow": "Coin Wallet",
+    "title": "Top up your Rallies Coins",
+    "description": "Use coins to create clubs, publish and boost tournaments, and unlock live scoreboard broadcasts.",
+    "balanceLabel": "Current Balance",
+    "coinsUnit": "Coins",
+    "buyCoins": "Select Package",
+    "closeCheckout": "Close Checkout",
+    "oneTimeBadge": "One-Time Pack",
+    "subscriptionBadge": "Monthly Pass",
+    "oneTimeDescription": "Instant coin pack with no recurring commitment.",
+    "subscriptionBenefit": "Best value: recurring monthly coin grant for active players and organizers.",
+    "noPackages": "No billing packages are configured yet. Add your Stripe Price IDs in backend/.env.",
+    "checkoutHeading": "Complete Payment",
+    "loadingCheckout": "Loading Stripe Checkout form...",
+    "checkoutError": "Unable to load Stripe Checkout. Verify your Stripe keys and try again.",
+    "syncingBalance": "Confirming payment and updating your balance...",
+    "paymentSuccess": "Payment confirmed! Your wallet balance has been updated.",
+    "paymentPending": "Payment submitted! Your coins will appear as soon as Stripe confirms the payment.",
+    "syncError": "Payment may have completed, but we couldn't refresh your balance automatically. Please reload the page."
   }
 }

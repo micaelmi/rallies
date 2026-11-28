@@ -9,7 +9,12 @@ export const envSchema = z.object({
   SWAGGER_BASE_URL: z.url().optional(),
   CLERK_SECRET_KEY: z.string().min(1).optional(),
   CLERK_JWT_KEY: z.string().min(1).optional(),
-  CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1).optional()
+  CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1).optional(),
+  STRIPE_SECRET_KEY: z.string().min(1).optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+  STRIPE_PRICE_ID_STARTER: z.string().min(1).optional(),
+  STRIPE_PRICE_ID_PRO: z.string().min(1).optional(),
+  STRIPE_PRICE_ID_CLUB_PASS: z.string().min(1).optional()
 });
 
 export type AppEnv = z.infer<typeof envSchema>;

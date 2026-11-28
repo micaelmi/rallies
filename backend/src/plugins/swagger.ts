@@ -22,6 +22,8 @@ export const swaggerPlugin = fp(async (app) => {
         { name: "system", description: "Technical and operational routes" },
         { name: "identity", description: "Identity and profile bootstrap routes" },
         { name: "profiles", description: "Public and authenticated player profile routes" },
+        { name: "wallet", description: "Authenticated coin wallet and ledger history routes" },
+        { name: "billing", description: "Stripe checkout and coin package catalog routes" },
         { name: "webhooks", description: "Third-party provider webhook endpoints" }
       ],
       components: {

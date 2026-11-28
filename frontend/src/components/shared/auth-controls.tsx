@@ -3,6 +3,7 @@ import { Show, UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
+import { WalletBalanceBadge } from "@/components/wallet/wallet-balance-badge";
 import { cn } from "@/lib/utils";
 
 export const AuthControls = async () => {
@@ -38,6 +39,7 @@ export const AuthControls = async () => {
       </Show>
       <Show when="signed-in">
         <div className="flex items-center gap-3">
+          <WalletBalanceBadge />
           <Link
             href="/profiles/me"
             className={cn(

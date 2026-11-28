@@ -12,7 +12,8 @@
     "locale": "Idioma",
     "signIn": "Entrar",
     "signUp": "Criar conta",
-    "myProfile": "Meu Perfil"
+    "myProfile": "Meu Perfil",
+    "wallet": "Carteira"
   },
   "landing": {
     "eyebrow": "Tênis de mesa conectado",
@@ -149,5 +150,26 @@
   "common": {
     "comingSoon": "Rota base pronta para implementação",
     "localeSwitch": "Trocar idioma"
+  },
+  "wallet": {
+    "eyebrow": "Carteira de Moedas",
+    "title": "Adicione Moedas Rallies",
+    "description": "Use moedas para criar clubes, publicar e impulsionar torneios e liberar transmissões ao vivo do placar.",
+    "balanceLabel": "Saldo Atual",
+    "coinsUnit": "Moedas",
+    "buyCoins": "Selecionar Pacote",
+    "closeCheckout": "Fechar Pagamento",
+    "oneTimeBadge": "Pacote Avulso",
+    "subscriptionBadge": "Passe Mensal",
+    "oneTimeDescription": "Pacote avulso de moedas sem cobrança recorrente.",
+    "subscriptionBenefit": "Melhor custo-benefício: recarga mensal recorrente para jogadores e organizadores.",
+    "noPackages": "Nenhum pacote configurado ainda. Adicione os Stripe Price IDs no backend/.env.",
+    "checkoutHeading": "Finalizar Pagamento",
+    "loadingCheckout": "Carregando formulário Stripe Checkout...",
+    "checkoutError": "Não foi possível carregar o Stripe Checkout. Verifique suas chaves Stripe e tente novamente.",
+    "syncingBalance": "Confirmando pagamento e atualizando seu saldo...",
+    "paymentSuccess": "Pagamento confirmado! Seu saldo foi atualizado.",
+    "paymentPending": "Pagamento enviado! Suas moedas aparecerão assim que o Stripe confirmar o pagamento.",
+    "syncError": "O pagamento pode ter sido concluído, mas não conseguimos atualizar seu saldo automaticamente. Recarregue a página."
   }
 }
