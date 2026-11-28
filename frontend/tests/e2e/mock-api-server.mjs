@@ -54,10 +54,44 @@ const profiles = new Map([
   ]
 ]);
 
+const walletPackages = [
+  {
+    id: "starter_pack",
+    priceId: "price_e2e_starter",
+    coinsAmount: 100,
+    kind: "ONE_TIME",
+    displayPriceCents: 500,
+    currency: "USD"
+  },
+  {
+    id: "pro_pack",
+    priceId: "price_e2e_pro",
+    coinsAmount: 500,
+    kind: "ONE_TIME",
+    displayPriceCents: 2000,
+    currency: "USD"
+  },
+  {
+    id: "club_pass_monthly",
+    priceId: "price_e2e_club_pass",
+    coinsAmount: 300,
+    kind: "SUBSCRIPTION",
+    displayPriceCents: 999,
+    currency: "USD"
+  }
+];
+
+let walletBalance = 0;
+const checkoutSessions = new Map();
+const syncedSessionIds = new Set();
+
 const setCorsHeaders = (res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-user-id, x-locale");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, x-user-id, x-locale"
+  );
 };
 
 const sendJson = (res, statusCode, payload) => {
@@ -98,6 +132,79 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && url.pathname === "/health") {
     sendJson(res, 200, { status: "ok" });
+    return;
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/v1/e2e/wallet/reset") {
+    walletBalance = 0;
+    checkoutSessions.clear();
+    syncedSessionIds.clear();
+    sendJson(res, 200, { balance: walletBalance });
+    return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/v1/wallet/balance") {
+    sendJson(res, 200, {
+      userId: "user_e2e_1",
+      balance: walletBalance,
+      currency: "COINS",
+      updatedAt: new Date().toISOString()
+    });
+    return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/v1/billing/packages") {
+    sendJson(res, 200, { packages: walletPackages });
+    return;
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/v1/billing/checkout-sessions") {
+    const body = await readBody(req);
+    const pkg = walletPackages.find((entry) => entry.priceId === body.priceId);
+    if (!pkg) {
+      sendJson(res, 400, {
+        error: { code: "INVALID_BILLING_PRICE", messageKey: "errors.billing.invalid_price" }
+      });
+      return;
+    }
+    const sessionId = `cs_e2e_${checkoutSessions.size + 1}_${Date.now()}`;
+    checkoutSessions.set(sessionId, pkg);
+    sendJson(res, 201, {
+      sessionId,
+      client_secret: `${sessionId}_secret_e2e`
+    });
+    return;
+  }
+
+  if (
+    req.method === "POST" &&
+    url.pathname.startsWith("/api/v1/billing/checkout-sessions/") &&
+    url.pathname.endsWith("/sync")
+  ) {
+    const sessionId = decodeURIComponent(
+      url.pathname
+        .replace("/api/v1/billing/checkout-sessions/", "")
+        .replace(/\/sync$/, "")
+    );
+    const pkg = checkoutSessions.get(sessionId);
+    if (!pkg) {
+      sendJson(res, 404, {
+        error: {
+          code: "CHECKOUT_SESSION_NOT_FOUND",
+          messageKey: "errors.billing.checkout_session_not_found"
+        }
+      });
+      return;
+    }
+
+    if (syncedSessionIds.has(sessionId)) {
+      sendJson(res, 200, { status: "already_processed", balance: walletBalance });
+      return;
+    }
+
+    syncedSessionIds.add(sessionId);
+    walletBalance += pkg.coinsAmount;
+    sendJson(res, 200, { status: "credited", balance: walletBalance });
     return;
   }
 

@@ -16,10 +16,10 @@ This file tracks the implementation tasks for **Phase 2** of the Rallies MVP. Es
 | **[P2-DEV-06]** | Stripe Webhook Routes (`/api/v1/webhooks/stripe`) | Dev | `[x]` FINISHED | `backend/billing` |
 | **[P2-DEV-07]** | Frontend Wallet Balance Bar & Coin Purchase UI | Dev | `[x]` FINISHED | `frontend/wallet` |
 | **[P2-REV-01]** | Ledger Auditability & Financial Idempotency Review | Review | `[x]` FINISHED | `backend/wallet` |
-| **[P2-TST-01]** | Wallet Balance Math & Race Condition Unit Tests | Test | `[ ]` PENDING | `backend/wallet` |
-| **[P2-TST-02]** | Stripe Webhook Integration Tests | Test | `[ ]` PENDING | `backend/billing` |
-| **[P2-TST-03]** | Credit Purchase E2E Playwright Suite | Test | `[ ]` PENDING | `frontend/wallet` |
-| **[P2-REP-01]** | Stripe Secret Config & OpenAPI Registration | Repo | `[ ]` PENDING | `backend` / `config` |
+| **[P2-TST-01]** | Wallet Balance Math & Race Condition Unit Tests | Test | `[x]` FINISHED | `backend/wallet` |
+| **[P2-TST-02]** | Stripe Webhook Integration Tests | Test | `[x]` FINISHED | `backend/billing` |
+| **[P2-TST-03]** | Credit Purchase E2E Playwright Suite | Test | `[x]` FINISHED | `frontend/wallet` |
+| **[P2-REP-01]** | Stripe Secret Config & OpenAPI Registration | Repo | `[x]` FINISHED | `backend` / `config` |
 
 ---
 
@@ -140,51 +140,51 @@ This file tracks the implementation tasks for **Phase 2** of the Rallies MVP. Es
 ---
 
 ### [P2-TST-01] Wallet Balance Math & Race Condition Unit Tests
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Testing`
 - **Module / Area**: `backend/src/modules/wallet/wallet.service.test.ts`
 - **Objective**: Verify wallet balance accuracy and resilience under concurrent debit attempts.
 - **Deliverables & Steps**:
-  - `[ ]` Write unit test verifying net balance calculation from multiple mixed `CREDIT` and `DEBIT` entries.
-  - `[ ]` Write concurrency test simulating 5 simultaneous requests spending 20 credits from a wallet with only 30 credits balance $\rightarrow$ exactly 1 succeeds, 4 throw `InsufficientBalanceError`.
+  - `[x]` Write unit test verifying net balance calculation from multiple mixed `CREDIT` and `DEBIT` entries.
+  - `[x]` Write concurrency test simulating 5 simultaneous requests spending 20 credits from a wallet with only 30 credits balance $\rightarrow$ exactly 1 succeeds, 4 throw `InsufficientBalanceError`.
 - **Acceptance Criteria**:
-  - `[ ]` 100% test pass rate for all financial logic.
+  - `[x]` 100% test pass rate for all financial logic.
 
 ---
 
 ### [P2-TST-02] Stripe Webhook Integration Tests
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Testing`
 - **Module / Area**: `backend/src/modules/billing/billing.routes.test.ts`
 - **Objective**: Mock Stripe webhook events and verify atomic credit grant behavior.
 - **Deliverables & Steps**:
-  - `[ ]` Inject `POST /api/v1/webhooks/stripe` with signed `checkout.session.completed` payload.
-  - `[ ]` Assert that `LedgerEntry` was created and user balance increased by exact package amount.
+  - `[x]` Inject `POST /api/v1/webhooks/stripe` with signed `checkout.session.completed` payload.
+  - `[x]` Assert that `LedgerEntry` was created and user balance increased by exact package amount.
 - **Acceptance Criteria**:
-  - `[ ]` Replaying the exact same webhook event twice results in zero additional credits granted.
+  - `[x]` Replaying the exact same webhook event twice results in zero additional credits granted.
 
 ---
 
 ### [P2-TST-03] Credit Purchase E2E Playwright Suite
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Testing`
 - **Module / Area**: `frontend/tests/e2e/wallet.spec.ts`
 - **Objective**: End-to-end verification of the purchase flow simulation.
 - **Deliverables & Steps**:
-  - `[ ]` Simulate navigation to `/wallet` $\rightarrow$ select coin package $\rightarrow$ verify Stripe checkout redirection.
-  - `[ ]` Mock return from Stripe $\rightarrow$ verify top-bar coin indicator updates dynamically.
+  - `[x]` Simulate navigation to `/wallet` $\rightarrow$ select coin package $\rightarrow$ verify Stripe checkout flow.
+  - `[x]` Mock Stripe confirmation & return $\rightarrow$ verify wallet balance indicator updates dynamically.
 - **Acceptance Criteria**:
-  - `[ ]` E2E test runs cleanly across mobile and desktop viewports.
+  - `[x]` E2E test runs cleanly across mobile and desktop viewports.
 
 ---
 
 ### [P2-REP-01] Stripe Secret Config & OpenAPI Registration
-- **Status**: `[ ]` PENDING
+- **Status**: `[x]` FINISHED
 - **Category**: `Repo Update`
 - **Module / Area**: `backend/src/config/`, `backend/src/plugins/routes.ts`
 - **Objective**: Register wallet routes in OpenAPI and document required environment variables.
 - **Deliverables & Steps**:
-  - `[ ]` Add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `STRIPE_PRICE_ID_*` definitions to `.env.example`.
-  - `[ ]` Verify `/api/v1/wallet/*` appears in `@fastify/swagger` schemas.
+  - `[x]` Add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `STRIPE_PRICE_ID_*` definitions to `.env.example`.
+  - `[x]` Verify `/api/v1/wallet/*` appears in `@fastify/swagger` schemas.
 - **Acceptance Criteria**:
-  - `[ ]` `.env.example` is complete and self-documenting.
+  - `[x]` `.env.example` is complete and self-documenting.

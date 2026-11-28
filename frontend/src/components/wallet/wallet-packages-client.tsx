@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import {
   AlertCircle,
@@ -32,7 +31,10 @@ export type BillingPackageView = {
 type WalletPackagesClientProps = {
   balance: number;
   packages: BillingPackageView[];
+  getToken?: () => Promise<string | null>;
 };
+
+const defaultGetToken = async (): Promise<string | null> => null;
 
 type StatusNotice = {
   tone: "success" | "info" | "error";
@@ -57,10 +59,10 @@ const sleep = (ms: number) =>
 
 export const WalletPackagesClient: React.FC<WalletPackagesClientProps> = ({
   balance,
-  packages
+  packages,
+  getToken = defaultGetToken
 }) => {
   const t = useTranslations("wallet");
-  const { getToken } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -93,13 +95,6 @@ export const WalletPackagesClient: React.FC<WalletPackagesClientProps> = ({
 
       try {
         const token = await getTokenRef.current();
-        if (!token) {
-          setStatusNotice({
-            tone: "error",
-            message: tRef.current("syncError")
-          });
-          return;
-        }
 
         let lastResult: SyncCheckoutResponse | null = null;
 
@@ -109,7 +104,7 @@ export const WalletPackagesClient: React.FC<WalletPackagesClientProps> = ({
             {
               method: "POST",
               headers: {
-                Authorization: `Bearer ${token}`
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
               }
             }
           );
@@ -297,6 +292,7 @@ export const WalletPackagesClient: React.FC<WalletPackagesClientProps> = ({
             priceId={selectedPriceId}
             loadingLabel={t("loadingCheckout")}
             errorLabel={t("checkoutError")}
+            getToken={getToken}
             onPaymentSuccess={syncSessionBalance}
           />
         </Card>

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PageFrame } from "@/components/shared/page-frame";
+import { ClerkWalletPackagesClient } from "@/components/wallet/clerk-wallet-packages-client";
 import {
   WalletPackagesClient,
   type BillingPackageView
@@ -17,8 +18,9 @@ type WalletPageProps = {
 async function AuthenticatedWalletView({ locale }: { locale: string }) {
   let balance = 0;
   let token: string | null = null;
+  const hasClerk = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
-  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+  if (hasClerk) {
     const { getToken } = await auth.protect();
     token = await getToken();
     if (!token) {
@@ -27,9 +29,12 @@ async function AuthenticatedWalletView({ locale }: { locale: string }) {
   }
 
   const [balanceRes, packagesRes] = await Promise.all([
-    token
+    token || !hasClerk
       ? fetch(`${getApiBaseUrl()}/wallet/balance`, {
-          headers: { Authorization: `Bearer ${token}`, "x-locale": locale },
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            "x-locale": locale
+          },
           cache: "no-store"
         }).catch(() => null)
       : Promise.resolve(null),
@@ -40,21 +45,31 @@ async function AuthenticatedWalletView({ locale }: { locale: string }) {
   ]);
 
   if (balanceRes?.ok) {
-    const data = (await balanceRes.json()) as { balance: number };
-    balance = data.balance;
+    const data = (await balanceRes.json().catch(() => null)) as {
+      balance: number;
+    } | null;
+    if (data) {
+      balance = data.balance;
+    }
   }
 
   let packages: BillingPackageView[] = [];
   if (packagesRes?.ok) {
-    const data = (await packagesRes.json()) as {
+    const data = (await packagesRes.json().catch(() => null)) as {
       packages: BillingPackageView[];
-    };
-    packages = data.packages;
+    } | null;
+    if (data) {
+      packages = data.packages;
+    }
   }
 
   return (
     <PageFrame className="py-10">
-      <WalletPackagesClient balance={balance} packages={packages} />
+      {hasClerk ? (
+        <ClerkWalletPackagesClient balance={balance} packages={packages} />
+      ) : (
+        <WalletPackagesClient balance={balance} packages={packages} />
+      )}
     </PageFrame>
   );
 }

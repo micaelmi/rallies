@@ -46,7 +46,10 @@ export default defineConfig({
       stdout: "pipe",
       stderr: "pipe",
       env: {
-        NEXT_PUBLIC_API_BASE_URL: API_BASE_URL
+        NEXT_PUBLIC_API_BASE_URL: API_BASE_URL,
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "",
+        CLERK_SECRET_KEY: "",
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_e2e_mock"
       }
     }
   ]

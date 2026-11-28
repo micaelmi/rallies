@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Script from "next/script";
-import { useAuth } from "@clerk/nextjs";
 import { Loader2, AlertCircle } from "lucide-react";
 import { getApiBaseUrl } from "@/lib/api/config";
 
@@ -62,16 +61,19 @@ type StripeEmbeddedCheckoutProps = {
   priceId: string;
   loadingLabel: string;
   errorLabel: string;
+  getToken?: () => Promise<string | null>;
   onPaymentSuccess?: (sessionId: string) => void | Promise<void>;
 };
+
+const defaultGetToken = async (): Promise<string | null> => null;
 
 export const StripeEmbeddedCheckout: React.FC<StripeEmbeddedCheckoutProps> = ({
   priceId,
   loadingLabel,
   errorLabel,
+  getToken = defaultGetToken,
   onPaymentSuccess
 }) => {
-  const { getToken } = useAuth();
   const [scriptLoaded, setScriptLoaded] = useState(
     () => typeof window !== "undefined" && typeof window.Stripe === "function"
   );

@@ -66,6 +66,8 @@ describe("OpenAPI & Swagger contract verification", () => {
     const declaredTags = new Set((spec.tags ?? []).map((tag) => tag.name));
     expect(declaredTags.has("profiles")).toBe(true);
     expect(declaredTags.has("identity")).toBe(true);
+    expect(declaredTags.has("wallet")).toBe(true);
+    expect(declaredTags.has("billing")).toBe(true);
     expect(declaredTags.has("system")).toBe(true);
     expect(declaredTags.has("webhooks")).toBe(true);
 
@@ -75,6 +77,14 @@ describe("OpenAPI & Swagger contract verification", () => {
     expect(paths["/api/v1/profiles/me"]?.put).toBeDefined();
     expect(paths["/api/v1/profiles/me"]?.patch).toBeDefined();
     expect(paths["/api/v1/profiles/{username}"]?.get).toBeDefined();
+    expect(paths["/api/v1/wallet/balance"]?.get).toBeDefined();
+    expect(paths["/api/v1/wallet/history"]?.get).toBeDefined();
+    expect(paths["/api/v1/billing/packages"]?.get).toBeDefined();
+    expect(paths["/api/v1/billing/checkout-sessions"]?.post).toBeDefined();
+    expect(
+      paths["/api/v1/billing/checkout-sessions/{sessionId}/sync"]?.post
+    ).toBeDefined();
+    expect(paths["/api/v1/webhooks/stripe"]?.post).toBeDefined();
 
     // Verify every operation tag is registered in top-level OpenAPI tags
     for (const methods of Object.values(paths)) {
